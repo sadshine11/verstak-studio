@@ -9,7 +9,7 @@ import { services } from '../data/studio';
         <summary class="svc__sum">
           <span class="svc__n mono">{String(i + 1).padStart(2, '0')}</span>
           <span class="svc__ttl">
-            <span class="svc__name">{s.title}</span>
+            <h3 class="svc__name">{s.title}</h3>
             <span class="svc__sub">{s.summary}</span>
           </span>
           <span class="svc__price num">{s.price}</span>
@@ -61,6 +61,7 @@ import { services } from '../data/studio';
   .svc__n { color: var(--ink-3); font-size: 0.6875rem; }
   .svc__ttl { display: grid; gap: 0.3rem; }
   .svc__name {
+    margin: 0;
     font-size: var(--step-2);
     font-weight: 600;
     letter-spacing: -0.02em;
