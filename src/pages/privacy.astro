@@ -1,0 +1,136 @@
+---
+import Base from '../layouts/Base.astro';
+import { studio } from '../data/studio';
+import { u } from '../lib/url';
+
+const sections = [
+  {
+    h: 'Кто обрабатывает данные',
+    p: [
+      `Оператор — ${studio.legalName}, ИНН ${studio.inn}, адрес: ${studio.address}. Вопросы по обработке данных: ${studio.email}.`,
+    ],
+  },
+  {
+    h: 'Какие данные мы получаем',
+    p: [
+      'Из формы брифа: имя, название компании, почта, телефон, бюджет, срок и текст задачи — всё, что вы ввели сами.',
+      'Автоматически: обезличенная статистика посещений — страницы, источник перехода, тип устройства. Эти данные не связываются с конкретным человеком.',
+    ],
+  },
+  {
+    h: 'Зачем они нужны',
+    p: [
+      'Чтобы ответить на заявку, обсудить задачу и подготовить смету. Для рассылок, рекламы и передачи третьим лицам данные не используются.',
+    ],
+  },
+  {
+    h: 'Сколько храним',
+    p: [
+      'Переписку по несостоявшемуся проекту — год, по действующему договору — срок договора и три года после его окончания, как требует бухгалтерское законодательство. Дальше удаляем.',
+    ],
+  },
+  {
+    h: 'Кому передаём',
+    p: [
+      'Никому, кроме сервисов, без которых не работает сама переписка: почтового провайдера и CRM, где хранится история обращений. Обе стороны связаны договором о конфиденциальности.',
+    ],
+  },
+  {
+    h: 'Ваши права',
+    p: [
+      'Вы можете запросить копию своих данных, исправить их, удалить или отозвать согласие. Достаточно письма на ' +
+        studio.email +
+        ' — ответим в течение трёх рабочих дней и удалим всё, что не обязаны хранить по закону.',
+    ],
+  },
+  {
+    h: 'Файлы cookie',
+    p: [
+      'Сайт использует только технические cookie, необходимые для его работы, и обезличенную веб-аналитику. Рекламных и отслеживающих сценариев здесь нет.',
+    ],
+  },
+];
+---
+
+<Base
+  title="Политика обработки персональных данных"
+  description="Какие данные собирает сайт студии ВЕРСТАК, зачем они нужны, сколько хранятся и как их удалить."
+>
+  <section class="band doc">
+    <div class="wrap grid">
+      <div class="doc__main">
+        <p class="label doc__crumbs">
+          <a href={u('/')}>Главная</a> <span aria-hidden="true">/</span> Политика
+        </p>
+        <h1>Политика обработки персональных данных</h1>
+        <p class="lede">
+          Коротко и без юридического тумана: что мы получаем через форму на сайте, зачем это
+          нужно и как от этого отказаться.
+        </p>
+
+        <div class="doc__body">
+          {
+            sections.map((s, i) => (
+              <section class="doc__sec">
+                <h2 class="doc__h">
+                  <span class="mono doc__n">{String(i + 1).padStart(2, '0')}</span>
+                  {s.h}
+                </h2>
+                <div class="doc__text">
+                  {s.p.map((text) => <p>{text}</p>)}
+                </div>
+              </section>
+            ))
+          }
+        </div>
+
+        <p class="mono doc__rev">
+          Редакция от 01.09.2026 · Демонстрационная версия: реквизиты вымышлены
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .doc__main { grid-column: 2 / span 9; display: grid; gap: 1.1rem; }
+  .doc__main h1 { font-size: var(--step-4); max-width: 22ch; }
+  .doc__crumbs { display: flex; gap: 0.5rem; }
+  .doc__crumbs a { text-decoration: none; }
+  .doc__crumbs a:hover { color: var(--accent); }
+
+  .doc__body {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line-2);
+  }
+  .doc__sec {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: 0.6rem var(--gutter);
+    align-items: start;
+  }
+  .doc__h {
+    display: grid;
+    gap: 0.35rem;
+    align-content: start;
+    font-size: var(--step-2);
+  }
+  .doc__n { color: var(--ink-3); }
+  .doc__text { display: grid; gap: 0.7rem; max-width: 62ch; }
+  .doc__text p { line-height: 1.6; color: var(--ink-2); }
+  .doc__rev {
+    color: var(--ink-3);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 900px) {
+    .doc__main { grid-column: 1 / -1; }
+    .doc__sec { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+    .doc__h { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

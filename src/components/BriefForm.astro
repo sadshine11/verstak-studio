@@ -1,5 +1,6 @@
 ---
 import { studio } from '../data/studio';
+import { u } from '../lib/url';
 
 interface Props {
   compact?: boolean;
@@ -90,7 +91,7 @@ const terms = ['Вчера', '1–2 месяца', 'В этом квартале
         <input type="checkbox" name="consent" required />
         <span class="consent__box" aria-hidden="true"></span>
         <span class="consent__text">
-          Согласен на обработку персональных данных — они нужны только чтобы ответить.
+          Согласен на <a href={u('/privacy')} target="_blank" rel="noopener">обработку персональных данных</a> — они нужны только чтобы ответить.
         </span>
       </label>
       <p class="field__err" data-err></p>
@@ -179,6 +180,7 @@ const terms = ['Вчера', '1–2 месяца', 'В этом квартале
   .consent input:checked + .consent__box::after { transform: rotate(-45deg) translate(1px, -1px) scale(1); }
   .consent input:focus-visible + .consent__box { outline: 2px solid var(--accent); outline-offset: 3px; }
   .consent__text { font-size: 0.8125rem; color: var(--ink-3); line-height: 1.45; }
+  .consent__text a { color: var(--ink); }
   .consent[data-invalid='true'] .consent__box { border-color: var(--danger); }
 
   .brief__submit {
