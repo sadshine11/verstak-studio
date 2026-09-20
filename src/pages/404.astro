@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+import { works } from '../data/studio';
+import { u } from '../lib/url';
+
+const picks = works.filter((w) => w.slug).slice(0, 3);
+---
+
+<Base title="Страница не найдена" description="Такой страницы на сайте студии ВЕРСТАК нет.">
+  <section class="nf band">
+    <div class="wrap grid">
+      <div class="nf__main">
+        <p class="label">Ошибка 404</p>
+        <h1>Страницы нет — <span class="em">и это наш недочёт</span></h1>
+        <p class="lede">
+          Ссылка устарела или в адресе опечатка. Если вы пришли сюда из письма от нас,
+          напишите — поправим и пришлём рабочую ссылку.
+        </p>
+        <div class="nf__act">
+          <a class="btn" href={u('/')}>
+            На главную
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="arrow-link" href={u('/contact')}>Сообщить о битой ссылке <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <nav class="nf__side" aria-label="Популярные разделы">
+        <p class="label">Куда обычно идут</p>
+        <ul class="nf__list">
+          <li><a href={u('/works')}>Все работы студии</a></li>
+          {picks.map((w) => <li><a href={u(`/works/${w.slug}`)}>Разбор: {w.client}</a></li>)}
+          <li><a href={u('/#estimate')}>Калькулятор сметы</a></li>
+          <li><a href={u('/studio')}>О студии и процессе</a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-block: clamp(3rem, 2rem + 5vw, 7rem); }
+  .nf__main { grid-column: span 7; display: grid; gap: 1.2rem; align-content: start; }
+  .nf__act { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; padding-top: 0.5rem; }
+
+  .nf__side {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding-left: var(--gutter);
+    border-left: 1px solid var(--line-2);
+  }
+  .nf__list { display: grid; gap: 0.5rem; }
+  .nf__list a { font-size: 0.9375rem; text-decoration: none; }
+  .nf__list a:hover { color: var(--accent); }
+
+  @media (max-width: 1000px) {
+    .nf__main { grid-column: 1 / -1; }
+    .nf__side {
+      grid-column: 1 / -1;
+      padding-left: 0;
+      border-left: 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line-2);
+      margin-top: 1rem;
+    }
+  }
+</style>

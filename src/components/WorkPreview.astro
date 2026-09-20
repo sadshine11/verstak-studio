@@ -1,0 +1,241 @@
+---
+/**
+ * Схема интерфейса проекта: не скриншот, а план экрана —
+ * что именно мы спроектировали. Рисуется вектором, весит байты.
+ */
+interface Props {
+  kind: string;
+  label?: string;
+}
+const { kind, label } = Astro.props;
+---
+
+<figure class="pv" data-kind={kind}>
+  <svg viewBox="0 0 320 210" role="img" aria-label={label ?? 'Схема экрана проекта'}>
+    <rect class="bg" x="0" y="0" width="320" height="210" />
+    <line class="ln" x1="0" y1="26" x2="320" y2="26" />
+    <rect class="ttl" x="14" y="13" width="54" height="6" />
+    <rect class="ttl dim" x="238" y="13" width="28" height="6" />
+    <rect class="ttl dim" x="274" y="13" width="32" height="6" />
+
+    {
+      kind === 'catalog' && (
+        <g>
+          <line class="ln" x1="96" y1="26" x2="96" y2="210" />
+          <rect class="fill" x="14" y="40" width="68" height="9" />
+          <rect class="fill dim" x="14" y="58" width="52" height="6" />
+          <rect class="fill dim" x="14" y="70" width="60" height="6" />
+          <rect class="fill dim" x="14" y="82" width="44" height="6" />
+          <rect class="acc" x="14" y="100" width="68" height="16" />
+          <rect class="fill dim" x="14" y="126" width="56" height="6" />
+          <rect class="fill dim" x="14" y="138" width="48" height="6" />
+          {[0, 1, 2, 3].map((i) => (
+            <g>
+              <line class="ln" x1="110" y1={62 + i * 34} x2="306" y2={62 + i * 34} />
+              <rect class="fill" x="110" y={44 + i * 34} width="86" height="7" />
+              <rect class="fill dim" x="110" y={55 + i * 34} width="54" height="5" />
+              <rect class="fill dim" x="250" y={46 + i * 34} width="38" height="7" />
+            </g>
+          ))}
+        </g>
+      )
+    }
+
+    {
+      kind === 'clinic' && (
+        <g>
+          <rect class="fill" x="14" y="40" width="80" height="8" />
+          <rect class="fill dim" x="14" y="56" width="120" height="6" />
+          {[0, 1, 2, 3, 4].map((c) =>
+            [0, 1, 2].map((r) => (
+              <rect
+                class={c === 2 && r === 1 ? 'acc' : 'cell'}
+                x={14 + c * 44}
+                y={80 + r * 26}
+                width={36}
+                height={18}
+              />
+            )),
+          )}
+          <line class="ln" x1="238" y1="26" x2="238" y2="210" />
+          <circle class="fill" cx="264" cy="54" r="12" />
+          <rect class="fill" x="252" y="76" width="54" height="7" />
+          <rect class="fill dim" x="252" y="89" width="40" height="5" />
+          <rect class="acc" x="252" y="110" width="54" height="14" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'estate' && (
+        <g>
+          <path class="stroke" d="M30 190 L30 60 L112 38 L112 190 Z" />
+          {[0, 1, 2, 3, 4].map((r) =>
+            [0, 1, 2].map((c) => (
+              <rect
+                class={r === 1 && c === 1 ? 'acc' : 'cell'}
+                x={40 + c * 24}
+                y={72 + r * 22}
+                width={18}
+                height={14}
+              />
+            )),
+          )}
+          <rect class="fill" x="150" y="44" width="92" height="9" />
+          <rect class="fill dim" x="150" y="61" width="140" height="6" />
+          <rect class="fill dim" x="150" y="73" width="110" height="6" />
+          <line class="ln" x1="150" y1="96" x2="306" y2="96" />
+          <rect class="fill" x="150" y="108" width="46" height="7" />
+          <rect class="fill dim" x="212" y="108" width="34" height="7" />
+          <rect class="fill dim" x="262" y="108" width="44" height="7" />
+          <rect class="acc" x="150" y="134" width="74" height="16" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'dash' && (
+        <g>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <rect class="bar" x={18 + i * 22} y={110 - [34, 48, 30, 62, 54, 76][i]} width="13" height={[34, 48, 30, 62, 54, 76][i]} />
+          ))}
+          <rect class="acc" x="150" y="34" width="13" height="76" />
+          <line class="ln" x1="14" y1="112" x2="306" y2="112" />
+          {[0, 1, 2, 3].map((i) => (
+            <g>
+              <rect class="fill" x="14" y={128 + i * 20} width="70" height="6" />
+              <rect class="fill dim" x="120" y={128 + i * 20} width="44" height="6" />
+              <rect class="fill dim" x="200" y={128 + i * 20} width="36" height="6" />
+              <rect class="fill dim" x="262" y={128 + i * 20} width="44" height="6" />
+            </g>
+          ))}
+        </g>
+      )
+    }
+
+    {
+      kind === 'shop' && (
+        <g>
+          {[0, 1, 2].map((i) => (
+            <g>
+              <rect class="cell" x={14 + i * 78} y="42" width="66" height="48" />
+              <rect class="fill" x={14 + i * 78} y="98" width="50" height="7" />
+              <rect class="fill dim" x={14 + i * 78} y="110" width="32" height="6" />
+            </g>
+          ))}
+          <line class="ln" x1="248" y1="26" x2="248" y2="210" />
+          <rect class="fill" x="260" y="42" width="46" height="7" />
+          <rect class="fill dim" x="260" y="56" width="34" height="5" />
+          <rect class="fill dim" x="260" y="68" width="40" height="5" />
+          <rect class="acc" x="260" y="88" width="46" height="16" />
+          <line class="ln" x1="14" y1="136" x2="230" y2="136" />
+          <rect class="fill dim" x="14" y="150" width="120" height="6" />
+          <rect class="fill dim" x="14" y="164" width="86" height="6" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'edu' && (
+        <g>
+          <rect class="fill" x="14" y="42" width="96" height="9" />
+          <rect class="cell" x="14" y="62" width="200" height="10" />
+          <rect class="acc" x="14" y="62" width="128" height="10" />
+          {[0, 1, 2, 3].map((i) => (
+            <g>
+              <line class="ln" x1="14" y1={92 + i * 28} x2="226" y2={92 + i * 28} />
+              <rect class={i === 1 ? 'acc' : 'cell'} x="14" y={102 + i * 28} width="12" height="12" />
+              <rect class="fill" x="34" y={104 + i * 28} width="88" height="7" />
+              <rect class="fill dim" x="180" y={104 + i * 28} width="46" height="7" />
+            </g>
+          ))}
+          <line class="ln" x1="244" y1="26" x2="244" y2="210" />
+          <rect class="fill dim" x="256" y="42" width="50" height="6" />
+          <rect class="fill dim" x="256" y="56" width="38" height="6" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'fund' && (
+        <g>
+          <rect class="fill" x="14" y="44" width="110" height="9" />
+          <rect class="fill dim" x="14" y="62" width="150" height="6" />
+          {[0, 1, 2, 3].map((i) => (
+            <rect class={i === 2 ? 'acc' : 'cell'} x={14 + i * 52} y="88" width="44" height="22" />
+          ))}
+          <rect class="cell" x="14" y="126" width="204" height="10" />
+          <rect class="acc" x="14" y="126" width="146" height="10" />
+          <rect class="fill dim" x="14" y="150" width="90" height="6" />
+          <line class="ln" x1="238" y1="26" x2="238" y2="210" />
+          <rect class="fill" x="252" y="44" width="54" height="7" />
+          <rect class="fill dim" x="252" y="58" width="40" height="5" />
+          <rect class="fill dim" x="252" y="70" width="46" height="5" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'fintech' && (
+        <g>
+          <polyline class="line" points="16,120 56,104 96,110 136,78 176,84 216,52 256,44" />
+          <circle class="dot" cx="256" cy="44" r="4" />
+          <line class="ln" x1="14" y1="138" x2="306" y2="138" />
+          <rect class="fill" x="14" y="152" width="96" height="9" />
+          <rect class="fill dim" x="14" y="170" width="130" height="6" />
+          <rect class="cell" x="182" y="150" width="124" height="16" />
+          <rect class="acc" x="182" y="174" width="72" height="18" />
+          <rect class="fill dim" x="14" y="44" width="60" height="6" />
+          <rect class="fill dim" x="14" y="56" width="40" height="6" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'hotel' && (
+        <g>
+          <path class="stroke" d="M26 96 L52 74 L78 96 L78 128 L26 128 Z" />
+          <path class="stroke" d="M96 96 L122 74 L148 96 L148 128 L96 128 Z" />
+          <path class="acc-stroke" d="M166 96 L192 74 L218 96 L218 128 L166 128 Z" />
+          <rect class="fill dim" x="26" y="142" width="52" height="6" />
+          <rect class="fill dim" x="96" y="142" width="52" height="6" />
+          <rect class="fill" x="166" y="142" width="52" height="6" />
+          <line class="ln" x1="238" y1="26" x2="238" y2="210" />
+          <rect class="fill" x="252" y="42" width="54" height="7" />
+          {[0, 1, 2].map((r) =>
+            [0, 1, 2, 3].map((c) => (
+              <rect
+                class={r === 1 && c > 0 && c < 3 ? 'acc' : 'cell'}
+                x={252 + c * 14}
+                y={60 + r * 16}
+                width={10}
+                height={10}
+              />
+            )),
+          )}
+        </g>
+      )
+    }
+  </svg>
+</figure>
+
+<style>
+  .pv {
+    margin: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  svg { width: 100%; height: auto; display: block; }
+  .bg { fill: var(--paper); }
+  .ln { stroke: var(--line-2); stroke-width: 1; }
+  .ttl { fill: var(--ink); }
+  .fill { fill: color-mix(in srgb, var(--ink) 70%, transparent); }
+  .fill.dim { fill: color-mix(in srgb, var(--ink) 26%, transparent); }
+  .cell { fill: color-mix(in srgb, var(--ink) 12%, transparent); }
+  .bar { fill: color-mix(in srgb, var(--ink) 32%, transparent); }
+  .acc { fill: var(--accent); }
+  .stroke { fill: none; stroke: color-mix(in srgb, var(--ink) 45%, transparent); stroke-width: 1.25; }
+  .acc-stroke { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1.25; }
+  .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+  .dot { fill: var(--accent); }
+</style>

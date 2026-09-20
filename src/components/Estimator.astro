@@ -1,0 +1,482 @@
+---
+/**
+ * Калькулятор сметы. Считает не «примерную стоимость сайта», а разделы
+ * сметы с часами — так же, как студия считает их в реальном проекте.
+ */
+import { u } from '../lib/url';
+
+const types = [
+  { id: 'promo', title: 'Лендинг под кампанию', note: 'одна страница, один оффер' },
+  { id: 'corporate', title: 'Корпоративный сайт', note: 'продукты, доказательства, заявки' },
+  { id: 'shop', title: 'Интернет-магазин', note: 'каталог, корзина, оплата' },
+  { id: 'product', title: 'Сервис или кабинет', note: 'роли, данные, сценарии' },
+];
+
+const integrations = [
+  { id: 'cms', title: 'CMS: редактор собирает страницы сам' },
+  { id: 'pay', title: 'Онлайн-оплата и чеки' },
+  { id: 'erp', title: 'Обмен с 1С или МойСклад' },
+  { id: 'crm', title: 'Передача заявок в CRM' },
+  { id: 'lk', title: 'Личный кабинет с авторизацией' },
+  { id: 'i18n', title: 'Вторая языковая версия' },
+];
+---
+
+<div class="est" data-est>
+  <form class="est__form" novalidate>
+    <fieldset class="est__group">
+      <legend class="label">1 · Что делаем</legend>
+      <div class="est__types">
+        {
+          types.map((t, i) => (
+            <label class="opt">
+              <input type="radio" name="est-type" value={t.id} checked={i === 1} />
+              <span class="opt__box" aria-hidden="true" />
+              <span class="opt__text">
+                <span class="opt__title">{t.title}</span>
+                <span class="opt__note">{t.note}</span>
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="est__group">
+      <legend class="label">2 · Объём</legend>
+      <div class="est__range">
+        <label for="est-screens" class="est__rangeLabel">
+          Уникальных экранов <span class="est__hint">(шаблонов, а не страниц каталога)</span>
+        </label>
+        <output class="est__out num" for="est-screens" data-screens>12</output>
+        <input
+          type="range"
+          id="est-screens"
+          name="screens"
+          min="1"
+          max="40"
+          value="12"
+          step="1"
+          aria-describedby="est-screens-hint"
+        />
+        <p class="mono est__scale"><span>1</span><span>40</span></p>
+        <p class="est__hint" id="est-screens-hint">
+          Главная, каталог, карточка, о компании, контакты — пять экранов. Остальные страницы
+          собираются из тех же компонентов.
+        </p>
+      </div>
+    </fieldset>
+
+    <fieldset class="est__group">
+      <legend class="label">3 · Дизайн</legend>
+      <div class="est__types est__types--row">
+        <label class="opt">
+          <input type="radio" name="est-design" value="system" checked />
+          <span class="opt__box" aria-hidden="true" />
+          <span class="opt__text">
+            <span class="opt__title">На нашей системе</span>
+            <span class="opt__note">быстрее, проверено на других проектах</span>
+          </span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="est-design" value="custom" />
+          <span class="opt__box" aria-hidden="true" />
+          <span class="opt__text">
+            <span class="opt__title">Индивидуальный</span>
+            <span class="opt__note">свой визуальный язык под бренд</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="est__group">
+      <legend class="label">4 · Что ещё нужно</legend>
+      <div class="est__checks">
+        {
+          integrations.map((it) => (
+            <label class="opt opt--check">
+              <input type="checkbox" name="int" value={it.id} checked={it.id === 'cms'} />
+              <span class="opt__box opt__box--sq" aria-hidden="true" />
+              <span class="opt__title">{it.title}</span>
+            </label>
+          ))
+        }
+        <label class="opt opt--check">
+          <input type="checkbox" name="content" value="1" />
+          <span class="opt__box opt__box--sq" aria-hidden="true" />
+          <span class="opt__title">Тексты и наполнение на студии</span>
+        </label>
+      </div>
+    </fieldset>
+  </form>
+
+  <aside class="est__sheet">
+    <div class="sheet">
+      <div class="sheet__head">
+        <span class="label">Предварительная смета</span>
+        <span class="mono sheet__date" data-date>—</span>
+      </div>
+
+      <div class="sheet__body">
+        <table class="tbl sheet__tbl">
+          <caption class="vh">Разделы сметы: часы и стоимость</caption>
+          <thead>
+            <tr>
+              <th scope="col">Раздел</th>
+              <th scope="col" class="ta-r">Часы</th>
+              <th scope="col" class="ta-r">Сумма</th>
+            </tr>
+          </thead>
+          <tbody data-rows></tbody>
+        </table>
+
+        <div class="sheet__total" aria-live="polite">
+          <div class="sheet__row">
+            <span class="label">Вилка проекта</span>
+            <strong class="sheet__sum num" data-total>—</strong>
+          </div>
+          <div class="sheet__row sheet__row--sub">
+            <span class="mono">Срок</span>
+            <span class="mono" data-weeks>—</span>
+          </div>
+          <div class="sheet__row sheet__row--sub">
+            <span class="mono">Платежи</span>
+            <span class="mono" data-pay>40% / 40% / 20%</span>
+          </div>
+        </div>
+
+        <p class="sheet__note">
+          Вилка считается по параметрам, а не по прайсу «от». После разведки мы даём смету
+          по неделям — в 9 проектах из 10 она попадает в эту вилку.
+        </p>
+
+        <div class="sheet__act">
+          <button class="btn" type="button" data-send data-fallback={u('/contact')}>
+            Отправить смету в бриф
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </button>
+          <a class="arrow-link sheet__alt" href={u('/contact')}>Обсудить голосом <span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<style>
+  .est {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+    gap: var(--gutter);
+    align-items: start;
+  }
+
+  .est__form { display: grid; gap: 1.75rem; }
+  .est__group { border: 0; padding: 0; margin: 0; display: grid; gap: 0.9rem; }
+  .est__group legend { padding: 0; margin-bottom: 0.2rem; }
+
+  .est__types { display: grid; gap: 0.5rem; }
+  .est__types--row { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+  .est__checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.4rem 1.25rem; }
+
+  .opt {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 55%, transparent);
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .opt:hover { border-color: var(--line-strong); }
+  .opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .opt__box {
+    width: 15px;
+    height: 15px;
+    margin-top: 0.22em;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: none;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .opt__box--sq { border-radius: 2px; }
+  .opt__box::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: inherit;
+    background: transparent;
+    transition: background var(--dur) var(--ease);
+  }
+  .opt input:checked + .opt__box { border-color: var(--accent); background: var(--accent); }
+  .opt input:checked + .opt__box::after { background: #ffffff; }
+  .opt:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--paper)); }
+  .opt input:focus-visible + .opt__box { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .opt__text { display: grid; gap: 0.15rem; }
+  .opt__title { font-size: 0.9375rem; font-weight: 500; line-height: 1.35; }
+  .opt__note { font-size: 0.8125rem; color: var(--ink-3); line-height: 1.35; }
+  .opt--check { padding: 0.55rem 0.7rem; border-color: transparent; background: transparent; }
+  .opt--check:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); border-color: transparent; }
+  .opt--check:has(input:checked) { background: transparent; border-color: transparent; }
+
+  .est__range { display: grid; gap: 0.4rem; grid-template-columns: minmax(0, 1fr) auto; }
+  .est__rangeLabel { font-size: 0.9375rem; font-weight: 500; }
+  .est__hint { grid-column: 1 / -1; font-size: 0.8125rem; color: var(--ink-3); line-height: 1.45; }
+  .est__rangeLabel .est__hint { display: inline; }
+  .est__out {
+    grid-row: 1;
+    grid-column: 2;
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .est__scale {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-3);
+    font-size: 0.6875rem;
+    margin-top: -0.35rem;
+  }
+
+  input[type='range'] {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 22px;
+    margin: 0.35rem 0 0;
+    background: transparent;
+    appearance: none;
+    cursor: ew-resize;
+  }
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--line-strong);
+  }
+  input[type='range']::-moz-range-track { height: 2px; background: var(--line-strong); }
+  input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -8px;
+    background: var(--accent);
+    border: 0;
+    border-radius: 0;
+    transition: transform var(--dur) var(--ease);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    border: 0;
+    border-radius: 0;
+  }
+  input[type='range']:hover::-webkit-slider-thumb { transform: scaleY(1.18); }
+  input[type='range']:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+  /* --- Лист сметы --- */
+  .est__sheet { position: sticky; top: 6.5rem; }
+  .sheet {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+  }
+  .sheet__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.1rem;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .sheet__head .label { color: #c6cad3; }
+  .sheet__date { color: #8c919c; font-size: 0.6875rem; }
+  .sheet__body { padding: 1.1rem; display: grid; gap: 1.1rem; }
+
+  .sheet__tbl td { padding: 0.5rem 0; font-size: 0.875rem; }
+  .sheet__tbl .ta-r { text-align: right; }
+  .sheet__tbl td.ta-r { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.8125rem; }
+  .sheet__tbl td:first-child { padding-right: 0.75rem; }
+  .sheet__tbl th.ta-r,
+  .sheet__tbl td.ta-r { padding-left: 0.85rem; white-space: nowrap; }
+  .sheet__tbl tr[data-off] td { color: var(--ink-3); }
+
+  .sheet__total { border-top: 1px solid var(--ink); padding-top: 0.9rem; display: grid; gap: 0.35rem; }
+  .sheet__row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  .sheet__sum { font-size: clamp(1.125rem, 0.9rem + 0.9vw, 1.5rem); font-weight: 600; letter-spacing: -0.03em; }
+  .sheet__row--sub span { color: var(--ink-3); }
+  .sheet__row--sub span:last-child { color: var(--ink); }
+
+  .sheet__note {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-3);
+    border-left: 2px solid var(--marker);
+    padding-left: 0.75rem;
+  }
+  .sheet__act { display: grid; gap: 0.75rem; justify-items: start; }
+  .sheet__act .btn { width: 100%; justify-content: space-between; }
+  .sheet__alt { font-size: 0.875rem; }
+
+  @media (max-width: 1000px) {
+    .est { grid-template-columns: minmax(0, 1fr); }
+    .est__sheet { position: static; }
+  }
+</style>
+
+<script>
+  type Row = { title: string; hours: number };
+
+  const RATE = 3400;
+
+  const BASE: Record<string, { h: Record<string, number>; min: number; perScreen: number; weeks: number }> = {
+    promo: { h: { research: 6, structure: 10, design: 22, dev: 26, launch: 6 }, min: 1, perScreen: 9, weeks: 3 },
+    corporate: { h: { research: 16, structure: 24, design: 48, dev: 60, launch: 12 }, min: 6, perScreen: 9, weeks: 6 },
+    shop: { h: { research: 20, structure: 34, design: 62, dev: 128, launch: 18 }, min: 10, perScreen: 10, weeks: 10 },
+    product: { h: { research: 26, structure: 44, design: 78, dev: 168, launch: 22 }, min: 12, perScreen: 13, weeks: 12 },
+  };
+
+  const INT: Record<string, { title: string; hours: number }> = {
+    cms: { title: 'CMS и обучение редактора', hours: 24 },
+    pay: { title: 'Оплата и чеки', hours: 20 },
+    erp: { title: 'Обмен с 1С / МойСклад', hours: 40 },
+    crm: { title: 'Интеграция с CRM', hours: 14 },
+    lk: { title: 'Личный кабинет', hours: 58 },
+    i18n: { title: 'Вторая языковая версия', hours: 30 },
+  };
+
+  const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+  const roundTo = (v: number, step: number) => Math.round(v / step) * step;
+
+  /** «21 неделя», «22 недели», «25 недель» — по последнему числу диапазона. */
+  const plural = (n: number, forms: [string, string, string]) => {
+    const d = n % 10;
+    const h = n % 100;
+    if (d === 1 && h !== 11) return forms[0];
+    if (d >= 2 && d <= 4 && (h < 10 || h >= 20)) return forms[1];
+    return forms[2];
+  };
+
+  const est = document.querySelector<HTMLElement>('[data-est]');
+  if (est) {
+    const form = est.querySelector<HTMLFormElement>('.est__form')!;
+    const screensOut = est.querySelector<HTMLElement>('[data-screens]')!;
+    const rowsBox = est.querySelector<HTMLElement>('[data-rows]')!;
+    const totalOut = est.querySelector<HTMLElement>('[data-total]')!;
+    const weeksOut = est.querySelector<HTMLElement>('[data-weeks]')!;
+    const dateOut = est.querySelector<HTMLElement>('[data-date]')!;
+    const sendBtn = est.querySelector<HTMLButtonElement>('[data-send]')!;
+
+    dateOut.textContent = new Intl.DateTimeFormat('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(new Date());
+
+    let last = { text: '', summary: '' };
+
+    function calc() {
+      const data = new FormData(form);
+      const type = String(data.get('est-type') ?? 'corporate');
+      const design = String(data.get('est-design') ?? 'system');
+      const screens = Number(data.get('screens') ?? 12);
+      const ints = data.getAll('int').map(String);
+      const content = data.get('content') === '1';
+
+      const base = BASE[type];
+      const extra = Math.max(0, screens - base.min);
+      const designMul = design === 'custom' ? 1.3 : 1;
+
+      const rows: Row[] = [
+        { title: 'Разведка и аналитика', hours: base.h.research + extra * 0.4 },
+        { title: 'Структура и прототипы', hours: base.h.structure + extra * 2.2 },
+        { title: 'Дизайн и дизайн-система', hours: (base.h.design + extra * 4) * designMul },
+        { title: 'Вёрстка и разработка', hours: base.h.dev + extra * base.perScreen * 0.55 },
+      ];
+
+      ints.forEach((id) => {
+        const item = INT[id];
+        if (item) rows.push({ title: item.title, hours: item.hours });
+      });
+
+      if (content) rows.push({ title: 'Тексты и наполнение', hours: 10 + screens * 1.4 });
+      rows.push({ title: 'Запуск, аналитика, передача', hours: base.h.launch + extra * 0.3 });
+
+      const hours = rows.reduce((s, r) => s + r.hours, 0);
+      const total = hours * RATE;
+      const low = roundTo(total * 0.94, 10000);
+      const high = roundTo(total * 1.16, 10000);
+      const weeksLow = Math.max(base.weeks, Math.round(hours / 30));
+      const weeksHigh = weeksLow + Math.max(2, Math.round(weeksLow * 0.25));
+
+      screensOut.textContent = String(screens);
+
+      rowsBox.replaceChildren(
+        ...rows.map((r) => {
+          const tr = document.createElement('tr');
+          const td1 = document.createElement('td');
+          td1.textContent = r.title;
+          const td2 = document.createElement('td');
+          td2.className = 'ta-r';
+          td2.textContent = String(Math.round(r.hours));
+          const td3 = document.createElement('td');
+          td3.className = 'ta-r';
+          td3.textContent = money.format(roundTo(r.hours * RATE, 1000));
+          tr.append(td1, td2, td3);
+          return tr;
+        }),
+      );
+
+      const text = `${money.format(low)} — ${money.format(high)} ₽`;
+      totalOut.textContent = text;
+      const weeksText = `${weeksLow}–${weeksHigh} ${plural(weeksHigh, ['неделя', 'недели', 'недель'])}`;
+      weeksOut.textContent = weeksText;
+
+      const typeTitle =
+        est!.querySelector<HTMLInputElement>(`input[name="est-type"]:checked`)?.closest('.opt')
+          ?.querySelector('.opt__title')?.textContent ?? '';
+      const intTitles = ints.map((id) => INT[id]?.title).filter(Boolean).join(', ');
+
+      last = {
+        text,
+        summary: [
+          `Предварительный расчёт с сайта:`,
+          `· Тип: ${typeTitle.trim()}`,
+          `· Уникальных экранов: ${screens}`,
+          `· Дизайн: ${design === 'custom' ? 'индивидуальный' : 'на системе студии'}`,
+          intTitles ? `· Дополнительно: ${intTitles}` : null,
+          content ? `· Тексты и наполнение — на студии` : null,
+          `· Вилка: ${text}, срок ${weeksText}`,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      };
+    }
+
+    form.addEventListener('input', calc);
+    form.addEventListener('change', calc);
+    calc();
+
+    sendBtn.addEventListener('click', () => {
+      const target = document.querySelector<HTMLTextAreaElement>('[data-brief-task]');
+      try {
+        sessionStorage.setItem('verstak-estimate', last.summary);
+      } catch {
+        /* приватный режим — просто пропускаем */
+      }
+      if (target) {
+        const existing = target.value.trim();
+        target.value = existing ? `${existing}\n\n${last.summary}` : last.summary;
+        target.dispatchEvent(new Event('input', { bubbles: true }));
+        target.closest('form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.setTimeout(() => target.focus({ preventScroll: true }), 400);
+      } else {
+        window.location.href = sendBtn.dataset.fallback ?? '';
+      }
+    });
+  }
+</script>

@@ -1,0 +1,100 @@
+---
+import Wordmark from './Wordmark.astro';
+import { studio, services } from '../data/studio';
+import { u } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="ftr band--ink">
+  <div class="wrap">
+    <div class="ftr__grid grid">
+      <div class="ftr__brand">
+        <a href={u('/')} class="ftr__wm" aria-label={`${studio.name} — на главную`}>
+          <Wordmark size={24} />
+        </a>
+        <p class="ftr__line">{studio.tagline}.<br />Работаем с 2017 года.</p>
+        <p class="mono ftr__addr">{studio.address}</p>
+      </div>
+
+      <nav class="ftr__col" aria-label="Разделы сайта">
+        <h2 class="label">Разделы</h2>
+        <ul>
+          <li><a href={u('/works')}>Работы</a></li>
+          <li><a href={u('/studio')}>Студия и процесс</a></li>
+          <li><a href={u('/#estimate')}>Калькулятор сметы</a></li>
+          <li><a href={u('/contact')}>Контакты и бриф</a></li>
+        </ul>
+      </nav>
+
+      <nav class="ftr__col" aria-label="Услуги">
+        <h2 class="label">Услуги</h2>
+        <ul>
+          {services.map((s) => <li><a href={u(`/#services`)}>{s.title}</a></li>)}
+        </ul>
+      </nav>
+
+      <div class="ftr__col">
+        <h2 class="label">Связь</h2>
+        <ul>
+          <li><a href={`mailto:${studio.email}`}>{studio.email}</a></li>
+          <li><a href={`tel:${studio.phoneHref}`}>{studio.phone}</a></li>
+          <li><a href={studio.telegramHref} rel="noopener">Telegram {studio.telegram}</a></li>
+        </ul>
+        <p class="mono ftr__hours">{studio.hours}</p>
+      </div>
+    </div>
+
+    <div class="ftr__bottom mono">
+      <span>© {year} {studio.legalName}</span>
+      <span>ИНН {studio.inn}</span>
+      <span class="ftr__demo">Демонстрационная версия: названия клиентов, цифры и контакты вымышлены</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) 1.5rem;
+    margin-top: auto;
+  }
+  .ftr__grid { row-gap: 2.5rem; }
+  .ftr__brand { grid-column: span 4; display: grid; gap: 0.9rem; align-content: start; }
+  .ftr__wm { text-decoration: none; width: fit-content; }
+  .ftr__line { color: #c6cad3; line-height: 1.5; }
+  .ftr__addr { color: #7f8492; max-width: 26ch; line-height: 1.5; }
+
+  .ftr__col { grid-column: span 2; display: grid; gap: 0.8rem; align-content: start; }
+  .ftr__col:nth-of-type(2) { grid-column: span 3; }
+  .ftr__col ul { display: grid; gap: 0.45rem; }
+  .ftr__col a {
+    text-decoration: none;
+    color: #dcdfe5;
+    font-size: 0.9375rem;
+  }
+  .ftr__col a:hover { color: var(--marker); }
+  .ftr__hours { color: #7f8492; padding-top: 0.4rem; }
+
+  .ftr__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    color: #7f8492;
+    font-size: 0.6875rem;
+  }
+  .ftr__demo { margin-left: auto; }
+
+  @media (max-width: 900px) {
+    .ftr__brand { grid-column: 1 / -1; }
+    .ftr__col { grid-column: span 3; }
+    .ftr__col:nth-of-type(2) { grid-column: span 3; }
+  }
+  @media (max-width: 560px) {
+    .ftr__col,
+    .ftr__col:nth-of-type(2) { grid-column: 1 / -1; }
+    .ftr__demo { margin-left: 0; }
+  }
+</style>

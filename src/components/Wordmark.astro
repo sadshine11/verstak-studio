@@ -1,0 +1,51 @@
+---
+interface Props {
+  size?: number;
+  label?: boolean;
+}
+const { size = 20, label = false } = Astro.props;
+---
+
+<span class="wm" style={`--wm-size:${size}px`}>
+  <span class="wm__word">ВЕРСТА</span><span class="wm__box">К</span>
+  {label && <span class="wm__sub mono">студия</span>}
+</span>
+
+<style>
+  .wm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: var(--wm-size);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .wm__word,
+  .wm__box {
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    font-size: 1em;
+  }
+  .wm__box {
+    display: inline-grid;
+    place-items: center;
+    width: 1.05em;
+    height: 1.05em;
+    margin-left: 0.06em;
+    background: var(--accent);
+    color: #ffffff;
+    letter-spacing: 0;
+    transform: translateY(-0.02em);
+  }
+  .wm__sub {
+    font-size: 0.55em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-left: 0.3em;
+    border-left: 1px solid var(--line-2);
+  }
+  a:hover .wm__box {
+    background: var(--ink);
+  }
+</style>

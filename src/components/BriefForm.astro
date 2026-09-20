@@ -1,0 +1,321 @@
+---
+import { studio } from '../data/studio';
+
+interface Props {
+  compact?: boolean;
+  /** Подставлять расчёт, сохранённый калькулятором на главной. */
+  prefill?: boolean;
+}
+const { compact = false, prefill = false } = Astro.props;
+
+const budgets = ['до 300 тыс', '300–700 тыс', '700–1500 тыс', 'больше 1,5 млн', 'пока не знаю'];
+const terms = ['Вчера', '1–2 месяца', 'В этом квартале', 'Изучаем рынок'];
+---
+
+<form class="brief" data-brief data-prefill={String(prefill)} novalidate>
+  <div class="brief__grid">
+    <div class="field" data-field="name">
+      <label for="bf-name">Как к вам обращаться *</label>
+      <input id="bf-name" name="name" type="text" autocomplete="name" placeholder="Имя" required />
+      <p class="field__err" id="bf-name-err" data-err></p>
+    </div>
+
+    <div class="field" data-field="company">
+      <label for="bf-company">Компания</label>
+      <input id="bf-company" name="company" type="text" autocomplete="organization" placeholder="Название" />
+      <p class="field__err"></p>
+    </div>
+
+    <div class="field" data-field="email">
+      <label for="bf-email">Почта *</label>
+      <input
+        id="bf-email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder="name@company.ru"
+        required
+      />
+      <p class="field__err" id="bf-email-err" data-err></p>
+    </div>
+
+    <div class="field" data-field="phone">
+      <label for="bf-phone">Телефон</label>
+      <input id="bf-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7" />
+      <p class="field__err"></p>
+    </div>
+
+    <div class="field brief__wide" data-field="task">
+      <label for="bf-task">Что за проект и какую задачу он решает *</label>
+      <textarea
+        id="bf-task"
+        name="task"
+        rows={compact ? 4 : 6}
+        placeholder="Пара абзацев: чем занимаетесь, что не так с текущим сайтом, к какому сроку нужен результат."
+        data-brief-task
+        required></textarea>
+      <p class="field__err" id="bf-task-err" data-err></p>
+    </div>
+
+    <fieldset class="brief__chips brief__wide">
+      <legend class="label">Бюджет</legend>
+      <div class="brief__row">
+        {
+          budgets.map((b, i) => (
+            <label class="tag">
+              <input type="radio" name="budget" value={b} checked={i === 1} />
+              <span>{b}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="brief__chips brief__wide">
+      <legend class="label">Когда нужен результат</legend>
+      <div class="brief__row">
+        {
+          terms.map((t, i) => (
+            <label class="tag">
+              <input type="radio" name="term" value={t} checked={i === 1} />
+              <span>{t}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="brief__wide brief__foot">
+      <label class="consent" data-field="consent">
+        <input type="checkbox" name="consent" required />
+        <span class="consent__box" aria-hidden="true"></span>
+        <span class="consent__text">
+          Согласен на обработку персональных данных — они нужны только чтобы ответить.
+        </span>
+      </label>
+      <p class="field__err" data-err></p>
+
+      <div class="brief__submit">
+        <button class="btn" type="submit">
+          Отправить бриф
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </button>
+        <p class="mono brief__reply">Отвечаем в рабочий день. Обычно — за 3 часа.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="brief__done" data-done hidden role="status">
+    <p class="brief__doneTitle">Бриф собран.</p>
+    <p class="brief__doneText" data-done-text></p>
+    <div class="brief__doneAct">
+      <a class="btn btn--ghost btn--sm" href="#" data-mailto>Открыть письмо в почте</a>
+      <button class="btn btn--ghost btn--sm" type="button" data-reset>Заполнить заново</button>
+    </div>
+    <p class="mono brief__demo">
+      Демонстрационная версия: форма ничего не отправляет. В рабочем варианте заявка уходит
+      в CRM и в Telegram студии, а отправителю приходит подтверждение.
+    </p>
+  </div>
+</form>
+
+<style>
+  .brief__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem var(--gutter);
+  }
+  .brief__wide { grid-column: 1 / -1; }
+
+  .brief__chips { border: 0; margin: 0; padding: 0.35rem 0 0; display: grid; gap: 0.55rem; }
+  .brief__chips legend { padding: 0; }
+  .brief__row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  .tag { position: relative; display: inline-flex; }
+  .tag input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .tag span {
+    display: inline-block;
+    padding: 0.45em 0.85em;
+    border: 1px solid var(--line-2);
+    font-size: 0.875rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+  .tag span:hover { border-color: var(--line-strong); }
+  .tag input:checked + span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tag input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .brief__foot { display: grid; gap: 0.6rem; padding-top: 0.5rem; }
+  .consent {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: start;
+    cursor: pointer;
+  }
+  .consent input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .consent__box {
+    width: 16px;
+    height: 16px;
+    margin-top: 0.2em;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    display: grid;
+    place-items: center;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  .consent__box::after {
+    content: '';
+    width: 8px;
+    height: 4px;
+    border-left: 1.5px solid #ffffff;
+    border-bottom: 1.5px solid #ffffff;
+    transform: rotate(-45deg) translate(1px, -1px) scale(0);
+    transition: transform 0.15s var(--ease);
+  }
+  .consent input:checked + .consent__box { background: var(--accent); border-color: var(--accent); }
+  .consent input:checked + .consent__box::after { transform: rotate(-45deg) translate(1px, -1px) scale(1); }
+  .consent input:focus-visible + .consent__box { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .consent__text { font-size: 0.8125rem; color: var(--ink-3); line-height: 1.45; }
+  .consent[data-invalid='true'] .consent__box { border-color: var(--danger); }
+
+  .brief__submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    padding-top: 0.35rem;
+  }
+  .brief__reply { color: var(--ink-3); }
+
+  .brief__done {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    border: 1px solid var(--ink);
+    padding: 1.5rem;
+    background: var(--paper);
+  }
+  .brief__doneTitle { font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; }
+  .brief__doneText { color: var(--ink-2); max-width: 52ch; line-height: 1.5; }
+  .brief__doneAct { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .brief__demo {
+    color: var(--ink-3);
+    border-top: 1px dashed var(--line-2);
+    padding-top: 0.75rem;
+    max-width: 60ch;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 720px) {
+    .brief__grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script define:vars={{ email: studio.email }}>
+  document.querySelectorAll('[data-brief]').forEach((form) => {
+    const done = form.querySelector('[data-done]');
+    const doneText = form.querySelector('[data-done-text]');
+    const mailto = form.querySelector('[data-mailto]');
+    const grid = form.querySelector('.brief__grid');
+
+    // Смета из калькулятора, если пользователь пришёл с главной.
+    const task = form.querySelector('[data-brief-task]');
+    try {
+      const saved = sessionStorage.getItem('verstak-estimate');
+      if (saved && task && !task.value.trim() && form.dataset.prefill === 'true') {
+        task.value = saved;
+      }
+    } catch (e) {
+      /* приватный режим */
+    }
+
+    const setError = (name, message) => {
+      const field = form.querySelector(`[data-field="${name}"]`);
+      if (!field) return;
+      field.dataset.invalid = message ? 'true' : 'false';
+      const err = field.querySelector('[data-err]') ?? field.parentElement?.querySelector('[data-err]');
+      if (err) err.textContent = message ?? '';
+      const input = field.querySelector('input, textarea');
+      if (input) {
+        input.setAttribute('aria-invalid', message ? 'true' : 'false');
+        if (message && err?.id) input.setAttribute('aria-describedby', err.id);
+      }
+    };
+
+    const validate = () => {
+      const data = new FormData(form);
+      const problems = [];
+      const name = String(data.get('name') ?? '').trim();
+      const mail = String(data.get('email') ?? '').trim();
+      const text = String(data.get('task') ?? '').trim();
+
+      if (name.length < 2) problems.push(['name', 'Напишите, как к вам обращаться']);
+      else setError('name', '');
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) problems.push(['email', 'Проверьте адрес почты']);
+      else setError('email', '');
+
+      if (text.length < 20) problems.push(['task', 'Несколько предложений о задаче — чтобы ответить по делу']);
+      else setError('task', '');
+
+      if (!data.get('consent')) problems.push(['consent', 'Без согласия мы не сможем ответить']);
+      else setError('consent', '');
+
+      problems.forEach(([field, message]) => setError(field, message));
+      return problems;
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const problems = validate();
+      if (problems.length) {
+        const first = form.querySelector(`[data-field="${problems[0][0]}"] input, [data-field="${problems[0][0]}"] textarea`);
+        first?.focus();
+        return;
+      }
+
+      const data = new FormData(form);
+      const lines = [
+        `Имя: ${data.get('name')}`,
+        data.get('company') ? `Компания: ${data.get('company')}` : null,
+        `Почта: ${data.get('email')}`,
+        data.get('phone') ? `Телефон: ${data.get('phone')}` : null,
+        `Бюджет: ${data.get('budget')}`,
+        `Срок: ${data.get('term')}`,
+        '',
+        String(data.get('task') ?? ''),
+      ].filter(Boolean);
+
+      if (doneText) {
+        doneText.textContent = `${data.get('name')}, спасибо. Ответим на ${data.get('email')} в ближайший рабочий день — с вопросами по задаче и предварительной вилкой.`;
+      }
+      if (mailto) {
+        mailto.setAttribute(
+          'href',
+          `mailto:${email}?subject=${encodeURIComponent('Бриф с сайта — ' + (data.get('company') || data.get('name')))}&body=${encodeURIComponent(lines.join('\n'))}`,
+        );
+      }
+      grid?.setAttribute('hidden', '');
+      if (done) done.hidden = false;
+      done?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    form.querySelector('[data-reset]')?.addEventListener('click', () => {
+      form.reset();
+      if (done) done.hidden = true;
+      grid?.removeAttribute('hidden');
+      ['name', 'email', 'task', 'consent'].forEach((f) => setError(f, ''));
+      form.querySelector('input')?.focus();
+    });
+
+    // Ошибки исчезают по мере исправления, а не ждут повторной отправки.
+    form.addEventListener('input', (e) => {
+      const el = e.target;
+      const field = el.closest?.('[data-field]');
+      if (field?.dataset.invalid === 'true') validate();
+    });
+  });
+</script>

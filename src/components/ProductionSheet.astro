@@ -1,0 +1,127 @@
+---
+import { inProgress, studio } from '../data/studio';
+---
+
+<div class="ps">
+  <div class="ps__head">
+    <span class="label ps__label">Производственный лист</span>
+    <span class="mono ps__date" data-ps-date>—</span>
+  </div>
+
+  <div class="ps__body">
+    <p class="label ps__sub">В работе сейчас</p>
+    <ul class="ps__list">
+      {
+        inProgress.map((p) => (
+          <li class="ps__item">
+            <span class="ps__client">{p.client}</span>
+            <span class="mono ps__stage">{p.stage}</span>
+            <span class="mono ps__week">
+              нед. {p.week}/{p.of}
+            </span>
+            <span class="ps__bar" aria-hidden="true">
+              <span class="ps__fill" style={`--p:${Math.round((p.week / p.of) * 100)}%`} />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="ps__slots">
+      <div class="ps__slotsRow">
+        <span class="label">Свободные слоты</span>
+        <span class="ps__dots" role="img" aria-label={`Свободно ${studio.slots.free} из ${studio.slots.total} слотов`}>
+          {
+            Array.from({ length: studio.slots.total }).map((_, i) => (
+              <span class:list={['ps__dot', { 'is-free': i >= studio.slots.total - studio.slots.free }]} />
+            ))
+          }
+        </span>
+      </div>
+      <p class="ps__start">
+        Ближайший старт — <strong>{studio.slots.nextStart}</strong>. Берём не больше пяти проектов
+        одновременно: иначе сроки держатся только на бумаге.
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ps {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+  }
+  .ps__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+    background: var(--ink);
+  }
+  .ps__label { color: #c6cad3; }
+  .ps__date { color: #8c919c; font-size: 0.6875rem; }
+
+  .ps__body { padding: 1rem 1rem 1.15rem; display: grid; gap: 0.85rem; }
+  .ps__sub { color: var(--ink-3); }
+
+  .ps__list { display: grid; gap: 0.7rem; }
+  .ps__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+  .ps__client { font-weight: 500; font-size: 0.9375rem; letter-spacing: -0.01em; }
+  .ps__stage { color: var(--ink-3); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .ps__week { color: var(--ink-2); font-size: 0.6875rem; }
+  .ps__bar {
+    grid-column: 1 / -1;
+    height: 3px;
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    display: block;
+  }
+  .ps__fill {
+    display: block;
+    height: 100%;
+    width: var(--p);
+    background: var(--ink);
+    transform-origin: left;
+    animation: grow 0.9s var(--ease) both;
+  }
+  @keyframes grow {
+    from { transform: scaleX(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ps__fill { animation: none; }
+  }
+
+  .ps__slots {
+    border-top: 1px solid var(--line);
+    padding-top: 0.85rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .ps__slotsRow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .ps__dots { display: inline-flex; gap: 4px; }
+  .ps__dot {
+    width: 14px;
+    height: 14px;
+    background: color-mix(in srgb, var(--ink) 16%, transparent);
+    border: 1px solid var(--line-2);
+  }
+  .ps__dot.is-free { background: var(--marker); border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+  .ps__start { font-size: 0.8125rem; line-height: 1.5; color: var(--ink-3); }
+  .ps__start strong { color: var(--ink); font-weight: 600; }
+</style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('[data-ps-date]');
+  if (el) {
+    el.textContent = new Intl.DateTimeFormat('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(new Date());
+  }
+</script>

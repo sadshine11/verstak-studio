@@ -1,0 +1,21 @@
+---
+interface Props {
+  n?: string;
+  title: string;
+  note?: string;
+  as?: 'h2' | 'h3';
+  id?: string;
+}
+const { n, title, note, as: Tag = 'h2', id } = Astro.props;
+---
+
+<div class="shead">
+  {n && <p class="shead__id label">{n}</p>}
+  <Tag class="shead__title" id={id}>{title}</Tag>
+  {note && <p class="shead__note">{note}</p>}
+  <slot />
+</div>
+
+<style>
+  .shead__title { font-size: var(--step-3); }
+</style>

@@ -1,0 +1,388 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Faq from '../components/Faq.astro';
+import { studio, team, principles, process, facts } from '../data/studio';
+import { u } from '../lib/url';
+---
+
+<Base
+  title="Студия"
+  description="Как устроена веб-студия ВЕРСТАК: принципы работы, команда из пяти человек, пять этапов проекта, ставка и порядок оплаты."
+>
+  <section class="phead">
+    <div class="wrap grid">
+      <div class="phead__main">
+        <p class="label phead__crumbs">
+          <a href={u('/')}>Главная</a> <span aria-hidden="true">/</span> Студия
+        </p>
+        <h1>Маленькая студия, которая <span class="em">не растёт специально</span></h1>
+        <p class="lede">
+          Пять человек в {studio.city} и максимум пять проектов одновременно. Мы пробовали
+          расти — и обнаружили, что на восьми параллельных проектах арт-директор перестаёт
+          видеть макеты, а сроки держатся только на словах. Поэтому берём меньше, чем можем
+          продать.
+        </p>
+      </div>
+
+      <dl class="phead__spec">
+        <div><dt class="label">Основана</dt><dd class="num">{studio.since}</dd></div>
+        <div><dt class="label">Человек</dt><dd class="num">{team.length}</dd></div>
+        <div><dt class="label">Проектов</dt><dd class="num">68</dd></div>
+        <div><dt class="label">Город</dt><dd>{studio.city}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Принципы -->
+  <section class="band band--paper">
+    <div class="wrap">
+      <div class="grid">
+        <SectionHead
+          n="01 / Принципы"
+          title="Четыре правила, из-за которых с нами иногда спорят"
+          note="Это не ценности с сайта — это то, что мы реально делаем, даже когда клиент просит наоборот."
+        />
+      </div>
+      <ul class="pr">
+        {
+          principles.map((p, i) => (
+            <li class="pr__item" data-reveal style={`--d:${i * 60}ms`}>
+              <span class="mono pr__n">{p.n}</span>
+              <h3 class="pr__t">{p.title}</h3>
+              <p class="pr__b">{p.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Команда -->
+  <section class="band">
+    <div class="wrap">
+      <div class="grid">
+        <SectionHead
+          n="02 / Команда"
+          title="Кто именно будет делать вашу работу"
+          note="Без «команды из 40 специалистов». Эти пятеро и делают — субподряд берём только на 3D и видео."
+        />
+      </div>
+      <ul class="team">
+        {
+          team.map((m) => (
+            <li class="team__item">
+              <span class="team__mono" aria-hidden="true">{m.initials}</span>
+              <div class="team__text">
+                <h3 class="team__name">{m.name}</h3>
+                <p class="mono team__role">{m.role}</p>
+                <p class="mono team__years">{m.years} лет в профессии</p>
+                <p class="team__duty">{m.duty}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Процесс -->
+  <section class="band band--ink">
+    <div class="wrap">
+      <div class="grid">
+        <SectionHead
+          n="03 / Процесс"
+          title="Как идёт проект по неделям"
+          note="Каждый этап заканчивается документом или сборкой. Не понравилось — останавливаемся здесь, без штрафов."
+        />
+      </div>
+
+      <div class="ptable">
+        <table class="tbl">
+          <caption class="vh">Этапы проекта, сроки, содержание и результат каждого этапа</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="p-n">Этап</th>
+              <th scope="col" class="p-t">Срок</th>
+              <th scope="col" class="p-w">Что происходит</th>
+              <th scope="col" class="p-o">На выходе</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              process.map((s) => (
+                <tr>
+                  <td class="p-n">
+                    <span class="mono ptable__n">{s.n}</span>
+                    <span class="ptable__ttl">{s.title}</span>
+                  </td>
+                  <td class="p-t mono">{s.term}</td>
+                  <td class="p-w">{s.body}</td>
+                  <td class="p-o">{s.output}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Деньги -->
+  <section class="band">
+    <div class="wrap">
+      <div class="grid">
+        <SectionHead
+          n="04 / Деньги"
+          title="Откуда берётся цифра в смете"
+          note="Ставка одна для всех ролей: час арт-директора и час разработчика стоят одинаково — так проще считать и нечего подкручивать."
+        />
+      </div>
+
+      <div class="money grid">
+        <dl class="money__facts">
+          <div><dt class="label">Ставка</dt><dd class="num money__big">3 400 ₽/час</dd></div>
+          <div><dt class="label">Платежи</dt><dd class="num money__big">40 / 40 / 20</dd></div>
+          <div><dt class="label">Гарантия</dt><dd class="num money__big">6 месяцев</dd></div>
+        </dl>
+
+        <ul class="money__list">
+          <li>
+            <strong>Смета фиксируется вилкой.</strong> Верхняя граница — потолок, ниже которого
+            мы обязаны уложиться. Выход за неё по нашей вине оплачиваем сами.
+          </li>
+          <li>
+            <strong>Дополнительные работы считаются отдельно.</strong> Если на середине проекта
+            появляется новый раздел — оцениваем его как отдельную строку, а не «доделываем по-тихому».
+          </li>
+          <li>
+            <strong>Час — это час работы, а не присутствия.</strong> Созвоны, статусы и переписка
+            входят в стоимость этапа и в смете отдельной строкой не появляются.
+          </li>
+          <li>
+            <strong>Остановиться можно после любого этапа.</strong> Оплачивается сделанное,
+            исходники и доступы передаются в тот же день.
+          </li>
+        </ul>
+      </div>
+
+      <dl class="facts">
+        {
+          facts.map((f) => (
+            <div class="facts__item">
+              <dt class="facts__v num">
+                {f.value}
+                <span class="facts__u">{f.unit}</span>
+              </dt>
+              <dd class="facts__n">{f.note}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- Вопросы -->
+  <section class="band band--paper">
+    <div class="wrap">
+      <div class="grid">
+        <SectionHead n="05 / Вопросы" title="То, что обычно спрашивают на первом созвоне" />
+      </div>
+      <div class="grid">
+        <div class="faqwrap">
+          <Faq />
+        </div>
+        <aside class="aside">
+          <p class="aside__t">Не нашли ответ?</p>
+          <p class="aside__b">
+            Напишите — ответим письмом, а не «менеджер свяжется с вами в течение 24 часов».
+          </p>
+          <a class="btn btn--sm" href={u('/contact')}>
+            Задать вопрос
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </a>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .phead {
+    padding-block: clamp(2rem, 1rem + 3vw, 3.5rem) clamp(2rem, 1rem + 3vw, 3rem);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .phead__main { grid-column: span 7; display: grid; gap: 1.1rem; align-content: start; }
+  .phead__crumbs { display: flex; gap: 0.5rem; }
+  .phead__crumbs a { text-decoration: none; }
+  .phead__crumbs a:hover { color: var(--accent); }
+  .phead__spec {
+    grid-column: 9 / span 4;
+    align-self: end;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding-left: var(--gutter);
+    border-left: 1px solid var(--line-2);
+  }
+  .phead__spec div { display: grid; gap: 0.3rem; }
+  .phead__spec dd { margin: 0; font-size: 1.0625rem; font-weight: 500; }
+
+  /* Принципы */
+  .pr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line-2);
+  }
+  .pr__item {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.5rem 0.75rem;
+    align-content: start;
+    padding: 1.5rem 2rem 1.75rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .pr__item:nth-child(odd) { border-right: 1px solid var(--line); }
+  .pr__item:nth-child(even) { padding-left: 2rem; }
+  .pr__n { grid-row: span 2; color: var(--ink-3); padding-top: 0.35rem; }
+  .pr__t { font-size: var(--step-2); }
+  .pr__b { grid-column: 2; font-size: 0.9375rem; line-height: 1.55; color: var(--ink-2); max-width: 44ch; }
+
+  /* Команда */
+  .team {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line-2);
+  }
+  .team__item {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+    padding: 1.5rem 1.25rem 1.75rem 0;
+    border-right: 1px solid var(--line);
+  }
+  .team__item:last-child { border-right: 0; }
+  .team__mono {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background: var(--ink);
+    color: var(--ground);
+    font: 500 0.875rem/1 var(--mono);
+    letter-spacing: 0.06em;
+  }
+  .team__text { display: grid; gap: 0.35rem; }
+  .team__name { font-size: 1.0625rem; letter-spacing: -0.012em; }
+  .team__role { color: var(--accent); font-size: 0.6875rem; }
+  .team__years { color: var(--ink-3); font-size: 0.6875rem; margin-top: -0.2rem; }
+  .team__duty { font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); }
+
+  /* Процесс — таблица */
+  .ptable { overflow-x: auto; }
+  .ptable table { min-width: 720px; }
+  .ptable .p-n { width: 18%; }
+  .ptable .p-t { width: 10%; }
+  .ptable .p-w { width: 42%; padding-right: 2rem; }
+  .ptable .p-o { width: 24%; }
+  .ptable td { padding-block: 1.1rem; vertical-align: top; }
+  .ptable__n { display: block; color: var(--marker); margin-bottom: 0.3rem; }
+  .ptable__ttl { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.015em; }
+  .ptable .p-t { color: var(--ink-3); }
+  .ptable .p-w { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+  .ptable .p-o { font-size: 0.875rem; line-height: 1.45; }
+
+  /* Деньги */
+  .money { row-gap: 2rem; margin-bottom: clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+  .money__facts {
+    grid-column: span 4;
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    align-content: start;
+  }
+  .money__facts div { display: grid; gap: 0.3rem; }
+  .money__facts dd { margin: 0; }
+  .money__big { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem); font-weight: 500; letter-spacing: -0.035em; }
+
+  .money__list { grid-column: 6 / span 7; display: grid; gap: 0.9rem; align-content: start; }
+  .money__list li {
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--line-2);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .money__list strong { color: var(--ink); font-weight: 600; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gutter);
+    margin: 0;
+    padding-top: clamp(2rem, 1rem + 2vw, 2.5rem);
+    border-top: 1px solid var(--line-2);
+  }
+  .facts__item { display: grid; gap: 0.5rem; align-content: start; }
+  .facts__v {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 1;
+  }
+  .facts__u { font-family: var(--font); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); }
+  .facts__n { margin: 0; font-size: 0.875rem; line-height: 1.45; color: var(--ink-2); max-width: 26ch; }
+
+  /* Вопросы */
+  .faqwrap { grid-column: span 8; }
+  .aside {
+    grid-column: 10 / span 3;
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    justify-items: start;
+    padding-left: var(--gutter);
+    border-left: 1px solid var(--line-2);
+  }
+  .aside__t { font-weight: 600; }
+  .aside__b { font-size: 0.875rem; line-height: 1.5; color: var(--ink-3); margin-bottom: 0.4rem; }
+
+  @media (max-width: 1000px) {
+    .phead__main { grid-column: 1 / -1; }
+    .phead__spec {
+      grid-column: 1 / -1;
+      padding-left: 0;
+      border-left: 0;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line-2);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .pr { grid-template-columns: minmax(0, 1fr); }
+    .pr__item,
+    .pr__item:nth-child(even) { padding: 1.35rem 0; border-right: 0; }
+    .money__facts,
+    .money__list,
+    .faqwrap { grid-column: 1 / -1; }
+    .money__facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .aside {
+      grid-column: 1 / -1;
+      padding-left: 0;
+      border-left: 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line-2);
+      margin-top: 1.5rem;
+    }
+    .team__item { border-right: 0; border-bottom: 1px solid var(--line); padding-right: 0; }
+  }
+  @media (max-width: 720px) {
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
+    .phead__spec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .money__facts { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  }
+</style>

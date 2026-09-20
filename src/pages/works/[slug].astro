@@ -1,0 +1,307 @@
+---
+import Base from '../../layouts/Base.astro';
+import WorkPreview from '../../components/WorkPreview.astro';
+import { cases } from '../../data/cases';
+import { u } from '../../lib/url';
+
+export function getStaticPaths() {
+  return cases.map((item, i) => ({
+    params: { slug: item.slug },
+    props: { item, next: cases[(i + 1) % cases.length] },
+  }));
+}
+
+const { item, next } = Astro.props;
+---
+
+<Base title={`${item.client} — разбор проекта`} description={item.intro}>
+  <article class="case">
+    <!-- Паспорт проекта -->
+    <section class="phead">
+      <div class="wrap grid">
+        <div class="phead__main">
+          <p class="label phead__crumbs">
+            <a href={u('/')}>Главная</a> <span aria-hidden="true">/</span>
+            <a href={u('/works')}>Работы</a> <span aria-hidden="true">/</span>
+            {item.client}
+          </p>
+          <h1>{item.title}</h1>
+          <p class="lede">{item.intro}</p>
+        </div>
+
+        <dl class="passport">
+          <div><dt class="label">Клиент</dt><dd>{item.client}</dd></div>
+          <div><dt class="label">Отрасль</dt><dd>{item.field}</dd></div>
+          <div><dt class="label">Год</dt><dd class="num">{item.year}</dd></div>
+          <div><dt class="label">Срок</dt><dd class="num">{item.term}</dd></div>
+          <div class="passport__wide"><dt class="label">Наша роль</dt><dd>{item.role}</dd></div>
+          <div class="passport__wide"><dt class="label">Состав команды</dt><dd>{item.crew}</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Схема экрана -->
+    <section class="band band--paper scheme">
+      <div class="wrap grid">
+        <figure class="scheme__fig">
+          <WorkPreview kind={item.preview} label={`Схема главного экрана: ${item.title}`} />
+          <figcaption class="mono scheme__cap">
+            Схема главного экрана — то, ради чего страница существует, без декора и цвета.
+          </figcaption>
+        </figure>
+        <ul class="stack">
+          <li class="label stack__t">Стек</li>
+          {item.stack.map((s) => <li class="stack__i mono">{s}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Задача и ограничения -->
+    <section class="band">
+      <div class="wrap grid">
+        <div class="task">
+          <h2 class="h-sec">Задача</h2>
+          <p class="task__text">{item.task}</p>
+        </div>
+        <div class="limits">
+          <h2 class="label">Ограничения</h2>
+          <ul class="limits__list">
+            {item.limits.map((l) => <li>{l}</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Решение -->
+    <section class="band band--ink">
+      <div class="wrap">
+        <div class="grid">
+          <h2 class="h-sec sol__h">Что мы сделали и почему именно так</h2>
+        </div>
+        <ol class="sol">
+          {
+            item.solution.map((s) => (
+              <li class="sol__item grid" data-reveal>
+                <div class="sol__head">
+                  <span class="mono sol__n">{s.n}</span>
+                  <h3 class="sol__title">{s.title}</h3>
+                </div>
+                <p class="sol__body">{s.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- Состав работ -->
+    <section class="band">
+      <div class="wrap grid">
+        <div class="made">
+          <h2 class="h-sec">Что вошло в проект</h2>
+          <ul class="made__list">
+            {item.made.map((m) => <li>{m}</li>)}
+          </ul>
+        </div>
+
+        <div class="result">
+          <h2 class="label">Результат</h2>
+          <dl class="result__grid">
+            {
+              item.metrics.map((m) => (
+                <div class="result__item">
+                  <dt class="result__v num">{m.value}</dt>
+                  <dd class="result__l">{m.label}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="result__after">{item.after}</p>
+        </div>
+      </div>
+    </section>
+
+    {
+      item.quote && (
+        <section class="band band--paper">
+          <div class="wrap grid">
+            <figure class="cq">
+              <blockquote class="cq__text em">«{item.quote.text}»</blockquote>
+              <figcaption class="cq__by">
+                <span class="cq__name">{item.quote.name}</span>
+                <span class="mono cq__post">{item.quote.post}</span>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Следующий проект -->
+    <nav class="band nextcase" aria-label="Следующий проект">
+      <div class="wrap">
+        <a class="nextcase__link" href={u(`/works/${next.slug}`)}>
+          <span class="label">Следующий разбор</span>
+          <span class="nextcase__ttl">{next.client} — {next.title}</span>
+          <span class="nextcase__go" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .h-sec {
+    font-size: var(--step-3);
+    letter-spacing: -0.024em;
+  }
+
+  .phead {
+    padding-block: clamp(2rem, 1rem + 3vw, 3.5rem) clamp(2rem, 1rem + 3vw, 3rem);
+  }
+  .phead__main { grid-column: span 7; display: grid; gap: 1.1rem; align-content: start; }
+  .phead__crumbs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .phead__crumbs a { text-decoration: none; }
+  .phead__crumbs a:hover { color: var(--accent); }
+
+  .passport {
+    grid-column: 9 / span 4;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    align-self: start;
+    padding: 1.1rem;
+    border: 1px solid var(--line-2);
+    background: color-mix(in srgb, var(--paper) 45%, transparent);
+  }
+  .passport div { display: grid; gap: 0.25rem; align-content: start; }
+  .passport__wide { grid-column: 1 / -1; }
+  .passport dd { margin: 0; font-size: 0.9375rem; line-height: 1.4; }
+
+  .scheme__fig { grid-column: span 8; margin: 0; display: grid; gap: 0.75rem; }
+  .scheme__cap { color: var(--ink-3); }
+  .stack {
+    grid-column: 10 / span 3;
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+  .stack__t { padding-bottom: 0.35rem; border-bottom: 1px solid var(--line-2); }
+  .stack__i { color: var(--ink-2); }
+
+  .task { grid-column: span 7; display: grid; gap: 1rem; align-content: start; }
+  .task__text { font-size: var(--step-1); line-height: 1.55; color: var(--ink-2); }
+  .limits {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding-left: var(--gutter);
+    border-left: 2px solid var(--marker);
+  }
+  .limits__list { display: grid; gap: 0.6rem; }
+  .limits__list li { font-size: 0.875rem; line-height: 1.45; color: var(--ink-2); }
+
+  .sol__h { grid-column: span 8; margin-bottom: 1.5rem; }
+  .sol { border-top: 1px solid var(--line); }
+  .sol__item {
+    padding-block: 1.6rem;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .sol__head { grid-column: span 4; display: flex; gap: 0.9rem; align-items: baseline; }
+  .sol__n { color: var(--marker); }
+  .sol__title { font-size: var(--step-2); }
+  .sol__body {
+    grid-column: 6 / span 7;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .made { grid-column: span 5; display: grid; gap: 1rem; align-content: start; }
+  .made__list { display: grid; gap: 0.55rem; }
+  .made__list li {
+    position: relative;
+    padding-left: 1.2rem;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .made__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .result { grid-column: 7 / span 6; display: grid; gap: 1.25rem; align-content: start; }
+  .result__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem var(--gutter);
+    margin: 0;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .result__item { display: grid; gap: 0.3rem; }
+  .result__v {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .result__l { margin: 0; font-size: 0.8125rem; color: var(--ink-3); line-height: 1.4; }
+  .result__after { font-size: 0.9375rem; line-height: 1.55; color: var(--ink-2); }
+
+  .cq { grid-column: 2 / span 9; margin: 0; display: grid; gap: 1rem; }
+  .cq__text { font-size: var(--step-2); line-height: 1.45; }
+  .cq__by { display: grid; gap: 0.2rem; }
+  .cq__name { font-weight: 600; font-size: 0.9375rem; }
+  .cq__post { color: var(--ink-3); }
+
+  .nextcase { padding-block: 0; }
+  .nextcase__link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--line-2);
+    text-decoration: none;
+  }
+  .nextcase__link .label { grid-column: 1 / -1; }
+  .nextcase__ttl {
+    font-size: var(--step-3);
+    font-weight: 600;
+    letter-spacing: -0.024em;
+    line-height: 1.15;
+    max-width: 24ch;
+  }
+  .nextcase__go {
+    align-self: end;
+    font-size: 1.5rem;
+    transition: transform var(--dur) var(--ease);
+  }
+  .nextcase__link:hover .nextcase__go { transform: translateX(6px); }
+
+  @media (max-width: 1000px) {
+    .phead__main,
+    .passport,
+    .scheme__fig,
+    .stack,
+    .task,
+    .limits,
+    .made,
+    .result,
+    .sol__h,
+    .cq { grid-column: 1 / -1; }
+    .sol__head { grid-column: 1 / -1; margin-bottom: 0.6rem; }
+    .sol__body { grid-column: 1 / -1; }
+    .limits { padding-left: 1rem; }
+    .result { margin-top: 1rem; }
+  }
+</style>

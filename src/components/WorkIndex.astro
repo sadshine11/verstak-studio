@@ -1,0 +1,262 @@
+---
+import WorkPreview from './WorkPreview.astro';
+import type { Work } from '../data/studio';
+import { u } from '../lib/url';
+
+interface Props {
+  items: Work[];
+  filter?: boolean;
+}
+const { items, filter = false } = Astro.props;
+const types = Array.from(new Set(items.map((w) => w.type)));
+---
+
+<div class="idx">
+  {
+    filter && (
+      <div class="idx__filter" data-filter>
+        <span class="label">Фильтр</span>
+        <div class="idx__chips" role="group" aria-label="Фильтр по типу проекта">
+          <button type="button" class="chip is-on" data-type="all" aria-pressed="true">
+            Все <span class="chip__n num">{items.length}</span>
+          </button>
+          {types.map((t) => (
+            <button type="button" class="chip" data-type={t} aria-pressed="false">
+              {t} <span class="chip__n num">{items.filter((w) => w.type === t).length}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  <div class="idx__body">
+    <div class="idx__table">
+      <table class="tbl idx__tbl">
+        <caption class="vh">Проекты студии: номер, клиент, задача, год и результат</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="c-n">№</th>
+            <th scope="col" class="c-cl">Клиент</th>
+            <th scope="col" class="c-wh">Что сделали</th>
+            <th scope="col" class="c-yr">Год</th>
+            <th scope="col" class="c-ef">Результат</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            items.map((w, i) => (
+              <tr class="row" data-row={i} data-type={w.type} tabindex="-1">
+                <td class="c-n num">{w.n}</td>
+                <td class="c-cl">
+                  {w.slug ? (
+                    <a class="row__link" href={u(`/works/${w.slug}`)} data-focus={i}>
+                      <span class="row__client">{w.client}</span>
+                      <span class="row__go" aria-hidden="true">разбор →</span>
+                    </a>
+                  ) : (
+                    <span class="row__client">{w.client}</span>
+                  )}
+                  <span class="row__field">{w.field}</span>
+                </td>
+                <td class="c-wh">{w.what}</td>
+                <td class="c-yr num">{w.year}</td>
+                <td class="c-ef">
+                  <span class="row__effect">{w.effect}</span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <aside class="idx__side" aria-hidden="true">
+      <div class="idx__sticky">
+        {
+          items.map((w, i) => (
+            <div class="pvcard" data-pv={i} data-on={i === 0 ? 'true' : 'false'}>
+              <WorkPreview kind={w.preview} label={`Схема экрана: ${w.what}`} />
+              <div class="pvcard__meta">
+                <span class="label">{w.type} · {w.year}</span>
+                <p class="pvcard__what">{w.what}</p>
+                <p class="mono pvcard__eff">{w.effect}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </aside>
+  </div>
+
+  <p class="idx__empty mono" data-empty hidden>Проектов этого типа в списке нет.</p>
+</div>
+
+<style>
+  .idx { display: grid; gap: 1.5rem; }
+
+  .idx__filter {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .idx__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    padding: 0.42em 0.8em;
+    border: 1px solid var(--line-2);
+    background: transparent;
+    color: inherit;
+    font: 500 0.875rem/1 var(--font);
+    cursor: pointer;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+  .chip:hover { border-color: var(--line-strong); }
+  .chip.is-on { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .chip__n { font-size: 0.6875rem; color: var(--ink-3); }
+  .chip.is-on .chip__n { color: color-mix(in srgb, var(--ground) 70%, transparent); }
+
+  .idx__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.42fr);
+    gap: var(--gutter);
+    align-items: start;
+  }
+
+  .idx__tbl { table-layout: fixed; }
+  .idx__tbl th.c-n { width: 3.2rem; }
+  .idx__tbl th.c-cl { width: 26%; }
+  .idx__tbl th.c-yr { width: 4.5rem; }
+  .idx__tbl th.c-ef { width: 27%; }
+
+  .row { transition: background var(--dur) var(--ease); }
+  .row td { transition: border-color var(--dur) var(--ease); padding-block: 0.95rem; }
+  .row:hover,
+  .row:focus-within { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+  .row:hover td:first-child,
+  .row:focus-within td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .row td:first-child { padding-left: 0.5rem; }
+  .row td:last-child { padding-right: 0.5rem; }
+  .row[hidden] { display: none; }
+
+  .c-n { color: var(--ink-3); font-size: 0.75rem; }
+  .row__link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5em;
+    text-decoration: none;
+  }
+  .row__client { font-weight: 600; letter-spacing: -0.015em; }
+  .row__go {
+    font: 500 0.6875rem/1 var(--mono);
+    color: var(--accent);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .row:hover .row__go,
+  .row:focus-within .row__go { opacity: 1; transform: none; }
+  .row__field {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    margin-top: 0.15rem;
+  }
+  .c-wh { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.4; padding-right: 1rem; }
+  .c-yr { color: var(--ink-3); font-size: 0.8125rem; }
+  .row__effect {
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-block;
+    line-height: 1.35;
+  }
+
+  .idx__sticky { position: sticky; top: 6.5rem; display: grid; }
+  .pvcard { grid-area: 1 / 1; opacity: 0; pointer-events: none; transition: opacity 0.2s var(--ease); }
+  .pvcard[data-on='true'] { opacity: 1; }
+  .pvcard__meta {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 0.8rem;
+  }
+  .pvcard__what { font-size: 0.9375rem; line-height: 1.4; }
+  .pvcard__eff { color: var(--accent); font-weight: 500; }
+
+  .idx__empty { color: var(--ink-3); }
+
+  @media (max-width: 1080px) {
+    .idx__body { grid-template-columns: minmax(0, 1fr); }
+    .idx__side { display: none; }
+    .idx__tbl th.c-ef, .idx__tbl td.c-ef { width: 32%; }
+  }
+
+  @media (max-width: 760px) {
+    .idx__tbl,
+    .idx__tbl tbody,
+    .idx__tbl tr,
+    .idx__tbl td { display: block; width: 100%; }
+    .idx__tbl thead { display: none; }
+    .row {
+      border-top: 1px solid var(--line);
+      padding: 1rem 0 1.1rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.15rem 0.9rem;
+    }
+    .row:hover td:first-child,
+    .row:focus-within td:first-child { box-shadow: none; }
+    .row td { border: 0; padding: 0; }
+    .idx__tbl td.c-ef,
+    .idx__tbl td.c-wh { width: auto; }
+    .c-n { grid-row: 1; align-self: baseline; }
+    .c-cl { grid-row: 1; }
+    .c-wh { grid-column: 2; font-size: 0.9375rem; margin-top: 0.4rem; }
+    .c-yr { grid-column: 2; margin-top: 0.5rem; font-size: 0.6875rem; }
+    .c-ef { grid-column: 2; margin-top: 0.15rem; }
+    .row__go { opacity: 1; transform: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.idx').forEach((idx) => {
+    const cards = idx.querySelectorAll<HTMLElement>('[data-pv]');
+    const rows = idx.querySelectorAll<HTMLElement>('[data-row]');
+
+    const show = (i: number) => {
+      cards.forEach((c) => (c.dataset.on = String(c.dataset.pv === String(i))));
+    };
+
+    rows.forEach((row) => {
+      const i = Number(row.dataset.row);
+      row.addEventListener('mouseenter', () => show(i));
+      row.addEventListener('focusin', () => show(i));
+    });
+
+    // Фильтр по типу проекта.
+    const filter = idx.querySelector<HTMLElement>('[data-filter]');
+    const empty = idx.querySelector<HTMLElement>('[data-empty]');
+    filter?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-type]');
+      if (!btn) return;
+      const type = btn.dataset.type;
+      filter.querySelectorAll<HTMLButtonElement>('button[data-type]').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      let shown = 0;
+      rows.forEach((row) => {
+        const on = type === 'all' || row.dataset.type === type;
+        row.hidden = !on;
+        if (on) shown += 1;
+      });
+      if (empty) empty.hidden = shown > 0;
+      const first = Array.from(rows).find((r) => !r.hidden);
+      if (first) show(Number(first.dataset.row));
+    });
+  });
+</script>

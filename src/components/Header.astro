@@ -1,0 +1,327 @@
+---
+import Wordmark from './Wordmark.astro';
+import { studio, nav } from '../data/studio';
+import { u } from '../lib/url';
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isActive = (href: string) => {
+  if (href.startsWith('/#')) return false;
+  const target = u(href).replace(/\/+$/, '');
+  return path === target || (href !== '/' && path.startsWith(target + '/'));
+};
+---
+
+<div class="topbar">
+  <div class="wrap topbar__in mono">
+    <span class="topbar__item">{studio.city}</span>
+    <span class="topbar__item topbar__item--hide">{studio.hours}</span>
+    <span class="topbar__clock" data-clock>
+      <span class="dot" data-clock-dot></span>
+      <span data-clock-text>—:—</span>
+    </span>
+    <span class="topbar__slots">
+      Свободны с {studio.slots.nextStart} · {studio.slots.free} из {studio.slots.total} слотов
+    </span>
+  </div>
+</div>
+
+<header class="hdr" data-header>
+  <div class="wrap hdr__in">
+    <a class="hdr__brand" href={u('/')} aria-label={`${studio.name} — на главную`}>
+      <Wordmark size={21} label />
+    </a>
+
+    <nav class="hdr__nav" aria-label="Основная навигация">
+      {
+        nav.map((item) => (
+          <a
+            href={u(item.href)}
+            class:list={['hdr__link', { 'is-active': isActive(item.href) }]}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.title}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hdr__act">
+      <a class="btn btn--sm hdr__cta" href={u('/contact')}>
+        Обсудить проект
+        <span class="btn__arrow" aria-hidden="true">→</span>
+      </a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="menu" data-burger>
+        <span class="burger__lines" aria-hidden="true"><i></i><i></i></span>
+        <span class="vh">Меню</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" hidden data-menu>
+  <div class="wrap menu__in">
+    <nav class="menu__nav" aria-label="Мобильная навигация">
+      {
+        nav.map((item, i) => (
+          <a href={u(item.href)} class="menu__link">
+            <span class="menu__n mono">{String(i + 1).padStart(2, '0')}</span>
+            {item.title}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="menu__foot">
+      <a href={`tel:${studio.phoneHref}`} class="menu__contact">{studio.phone}</a>
+      <a href={`mailto:${studio.email}`} class="menu__contact">{studio.email}</a>
+      <p class="mono menu__note">{studio.slots.free} свободных слота · старт с {studio.slots.nextStart}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .topbar {
+    background: var(--ink);
+    color: #b9bec8;
+    border-bottom: 1px solid #000000;
+  }
+  .topbar__in {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    height: 30px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+  .topbar__item { color: #8c919c; }
+  .topbar__slots {
+    margin-left: auto;
+    color: var(--marker);
+    white-space: nowrap;
+  }
+  .topbar__clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    color: #b9bec8;
+    font-variant-numeric: tabular-nums;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #6e727c;
+    border-radius: 50%;
+    flex: none;
+  }
+  .dot[data-open='true'] {
+    background: #58d09a;
+    box-shadow: 0 0 0 0 rgba(88, 208, 154, 0.55);
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    70% { box-shadow: 0 0 0 6px rgba(88, 208, 154, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(88, 208, 154, 0); }
+  }
+  @media (max-width: 860px) {
+    .topbar__item--hide { display: none; }
+  }
+  @media (max-width: 620px) {
+    .topbar__clock { display: none; }
+    .topbar__slots { font-size: 0.625rem; }
+  }
+
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 70;
+    background: var(--ground);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .hdr[data-stuck='true'] {
+    border-bottom-color: var(--line-2);
+    background: color-mix(in srgb, var(--ground) 92%, #ffffff);
+  }
+  .hdr__in {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 68px;
+  }
+  .hdr__brand { text-decoration: none; }
+  .hdr__brand:hover { color: inherit; }
+
+  .hdr__nav {
+    display: flex;
+    gap: 1.6rem;
+    margin-left: auto;
+  }
+  .hdr__link {
+    position: relative;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    padding-block: 0.35rem;
+  }
+  .hdr__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: right var(--dur) var(--ease);
+  }
+  .hdr__link:hover::after { right: 0; }
+  .hdr__link.is-active { color: var(--accent); }
+  .hdr__link.is-active::after { right: 0; }
+
+  .hdr__act {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .burger {
+    display: none;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+  }
+  .burger__lines {
+    display: grid;
+    gap: 5px;
+    justify-items: center;
+  }
+  .burger__lines i {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  }
+  .burger[aria-expanded='true'] .burger__lines i:first-child { transform: translateY(3.25px) rotate(45deg); }
+  .burger[aria-expanded='true'] .burger__lines i:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+
+  @media (max-width: 1000px) {
+    .hdr__nav { display: none; }
+    .burger { display: grid; place-items: center; }
+  }
+  @media (max-width: 560px) {
+    .hdr__cta { display: none; }
+    .hdr__in { height: 60px; }
+  }
+
+  /* Шапка остаётся поверх открытого меню — логотип и крестик видны. */
+  :global(html[data-menu='open']) .hdr {
+    background: transparent;
+    color: #f0f1ed;
+    border-bottom-color: transparent;
+  }
+  :global(html[data-menu='open']) .burger { border-color: color-mix(in srgb, #ffffff 40%, transparent); }
+  :global(html[data-menu='open']) .hdr__brand { color: #f0f1ed; }
+
+  /* --- Мобильное меню --- */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--ink);
+    color: var(--paper);
+    display: grid;
+    align-content: space-between;
+    padding-block: 5.5rem 2rem;
+    animation: menuIn 0.24s var(--ease);
+  }
+  @keyframes menuIn {
+    from { opacity: 0; transform: translateY(-8px); }
+  }
+  .menu__nav { display: grid; }
+  .menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+    font-size: clamp(1.75rem, 1.2rem + 3vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+  }
+  .menu__link:hover { color: var(--marker); }
+  .menu__n { font-size: 0.75rem; color: #7f8492; }
+  .menu__foot { display: grid; gap: 0.35rem; padding-top: 2rem; }
+  .menu__contact { font-size: 1.125rem; text-decoration: none; width: fit-content; }
+  .menu__contact:hover { color: var(--marker); }
+  .menu__note { color: #7f8492; padding-top: 0.5rem; }
+</style>
+
+<script>
+  // Часы студии: местное время и признак «сейчас на связи».
+  const text = document.querySelector<HTMLElement>('[data-clock-text]');
+  const dot = document.querySelector<HTMLElement>('[data-clock-dot]');
+
+  function tick() {
+    if (!text || !dot) return;
+    const now = new Date();
+    const fmt = new Intl.DateTimeFormat('ru-RU', {
+      timeZone: 'Europe/Moscow',
+      hour: '2-digit',
+      minute: '2-digit',
+      weekday: 'short',
+    });
+    const parts = fmt.formatToParts(now);
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    const hour = Number(get('hour'));
+    const weekday = get('weekday');
+    const workday = !['сб', 'вс'].includes(weekday.toLowerCase().slice(0, 2));
+    const open = workday && hour >= 10 && hour < 19;
+    text.textContent = `${get('hour')}:${get('minute')} в студии`;
+    dot.dataset.open = String(open);
+    dot.title = open ? 'Сейчас на связи' : 'Вне рабочего времени — ответим утром';
+  }
+  tick();
+  setInterval(tick, 20000);
+
+  // Тень-линия у липкой шапки после прокрутки.
+  const hdr = document.querySelector<HTMLElement>('[data-header]');
+  const onScroll = () => {
+    if (hdr) hdr.dataset.stuck = String(window.scrollY > 24);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Мобильное меню.
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  function setMenu(open: boolean) {
+    if (!burger || !menu) return;
+    menu.hidden = !open;
+    burger.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    if (open) document.documentElement.dataset.menu = 'open';
+    else delete document.documentElement.dataset.menu;
+    if (open) menu.querySelector<HTMLAnchorElement>('a')?.focus();
+  }
+
+  burger?.addEventListener('click', () => setMenu(menu?.hidden ?? true));
+  menu?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setMenu(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.hidden) {
+      setMenu(false);
+      burger?.focus();
+    }
+  });
+  const mq = window.matchMedia('(min-width: 1001px)');
+  mq.addEventListener('change', (e) => {
+    if (e.matches) setMenu(false);
+  });
+</script>

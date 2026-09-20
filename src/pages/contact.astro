@@ -1,0 +1,186 @@
+---
+import Base from '../layouts/Base.astro';
+import BriefForm from '../components/BriefForm.astro';
+import { studio } from '../data/studio';
+import { u } from '../lib/url';
+
+const decline = [
+  'Нужно «как у конкурента, только лучше» — без разговора о том, кто ваш покупатель',
+  'Срок «к пятнице», потому что кто-то уже пообещал его сверху',
+  'Сайт делает другая команда, а нас зовут «нарисовать красиво» поверх готового',
+  'Бюджет меньше 150 000 ₽ — для такой задачи честнее фрилансер, и мы подскажем кого',
+];
+---
+
+<Base
+  title="Контакты и бриф"
+  description="Расскажите про задачу: бриф на три минуты, ответ в рабочий день. Телефон, почта и Telegram студии ВЕРСТАК."
+>
+  <section class="phead">
+    <div class="wrap grid">
+      <div class="phead__main">
+        <p class="label phead__crumbs">
+          <a href={u('/')}>Главная</a> <span aria-hidden="true">/</span> Контакты
+        </p>
+        <h1>Давайте разберёмся, <span class="em">нужны ли мы вам</span></h1>
+        <p class="lede">
+          Первый ответ — письмо с вопросами по задаче, а не коммерческое предложение на
+          двенадцать слайдов. Если поймём, что задача не наша, скажем сразу и по возможности
+          посоветуем, к кому пойти.
+        </p>
+      </div>
+
+      <ul class="direct">
+        <li><a class="direct__link" href={`mailto:${studio.email}`}>{studio.email}</a></li>
+        <li><a class="direct__link" href={`tel:${studio.phoneHref}`}>{studio.phone}</a></li>
+        <li><a class="direct__link" href={studio.telegramHref} rel="noopener">Telegram {studio.telegram}</a></li>
+        <li class="mono direct__hours">{studio.hours}</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap grid">
+      <div class="formwrap">
+        <h2 class="formwrap__h">Бриф</h2>
+        <p class="formwrap__note">
+          Полей немного: остальное быстрее выяснить голосом. Если вы уже считали смету
+          на главной, расчёт подставится в описание задачи сам.
+        </p>
+        <BriefForm prefill />
+      </div>
+
+      <aside class="side">
+        <section class="side__block">
+          <h2 class="label">Что будет дальше</h2>
+          <ol class="side__steps">
+            <li><span class="mono side__n">1</span> Читаем бриф и отвечаем письмом с вопросами — в рабочий день, обычно за 3 часа.</li>
+            <li><span class="mono side__n">2</span> Созваниваемся на 40 минут: задача, аудитория, сроки, бюджет.</li>
+            <li><span class="mono side__n">3</span> Присылаем вилку и план по неделям. До этого момента вы ничего не платите и ничего не подписываете.</li>
+          </ol>
+        </section>
+
+        <section class="side__block">
+          <h2 class="label">Когда мы отказываемся</h2>
+          <ul class="side__decline">
+            {decline.map((d) => <li>{d}</li>)}
+          </ul>
+        </section>
+
+        <section class="side__block">
+          <h2 class="label">Реквизиты</h2>
+          <dl class="side__req">
+            <div><dt>Юрлицо</dt><dd>{studio.legalName}</dd></div>
+            <div><dt>ИНН</dt><dd class="num">{studio.inn}</dd></div>
+            <div><dt>Адрес</dt><dd>{studio.address}</dd></div>
+            <div><dt>Договор</dt><dd>Работаем по договору подряда с приложением-ТЗ. Закрывающие документы — по этапам.</dd></div>
+          </dl>
+        </section>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .phead {
+    padding-block: clamp(2rem, 1rem + 3vw, 3.5rem) clamp(2rem, 1rem + 3vw, 3rem);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .phead__main { grid-column: span 7; display: grid; gap: 1.1rem; align-content: start; }
+  .phead__crumbs { display: flex; gap: 0.5rem; }
+  .phead__crumbs a { text-decoration: none; }
+  .phead__crumbs a:hover { color: var(--accent); }
+
+  .direct {
+    grid-column: 9 / span 4;
+    align-self: end;
+    display: grid;
+    gap: 0.3rem;
+    padding-left: var(--gutter);
+    border-left: 1px solid var(--line-2);
+  }
+  .direct__link {
+    font-size: 1.125rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: -0.015em;
+    width: fit-content;
+  }
+  .direct__hours { color: var(--ink-3); padding-top: 0.5rem; }
+
+  .formwrap { grid-column: span 7; display: grid; gap: 0.75rem; align-content: start; }
+  .formwrap__h { font-size: var(--step-3); }
+  .formwrap__note {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--ink-3);
+    max-width: 52ch;
+    margin-bottom: 0.75rem;
+  }
+
+  .side {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+    padding-left: var(--gutter);
+    border-left: 1px solid var(--line-2);
+  }
+  .side__block { display: grid; gap: 0.75rem; }
+
+  .side__steps { display: grid; gap: 0.7rem; }
+  .side__steps li {
+    display: grid;
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .side__n {
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border: 1px solid var(--line-strong);
+    font-size: 0.625rem;
+  }
+
+  .side__decline { display: grid; gap: 0.55rem; }
+  .side__decline li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .side__decline li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 1px;
+    background: var(--danger);
+  }
+
+  .side__req { display: grid; gap: 0.6rem; margin: 0; }
+  .side__req div { display: grid; gap: 0.15rem; }
+  .side__req dt { font-family: var(--mono); font-size: 0.6875rem; color: var(--ink-3); }
+  .side__req dd { margin: 0; font-size: 0.875rem; line-height: 1.45; }
+
+  @media (max-width: 1000px) {
+    .phead__main,
+    .formwrap { grid-column: 1 / -1; }
+    .direct,
+    .side {
+      grid-column: 1 / -1;
+      padding-left: 0;
+      border-left: 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line-2);
+      margin-top: 1.5rem;
+    }
+    .direct { margin-top: 0.5rem; }
+  }
+</style>
