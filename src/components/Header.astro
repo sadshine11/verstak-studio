@@ -92,7 +92,7 @@ const isActive = (href: string) => {
     font-size: 0.6875rem;
     letter-spacing: 0.04em;
   }
-  .topbar__item { color: #8c919c; }
+  .topbar__item { color: #8c919c; white-space: nowrap; }
   .topbar__slots {
     margin-left: auto;
     color: var(--marker);
@@ -125,7 +125,8 @@ const isActive = (href: string) => {
     .topbar__item--hide { display: none; }
   }
   @media (max-width: 620px) {
-    .topbar__clock { display: none; }
+    .topbar__clock,
+    .topbar__item { display: none; }
     .topbar__slots { font-size: 0.625rem; }
   }
 
