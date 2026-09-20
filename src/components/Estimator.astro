@@ -59,7 +59,7 @@ const integrations = [
           step="1"
           aria-describedby="est-screens-hint"
         />
-        <p class="mono est__scale"><span>1</span><span>40</span></p>
+        <p class="mono est__scale"><span data-scale-min>1</span><span>40</span></p>
         <p class="est__hint" id="est-screens-hint">
           Главная, каталог, карточка, о компании, контакты — пять экранов. Остальные страницы
           собираются из тех же компонентов.
@@ -408,8 +408,8 @@ const integrations = [
 
       const hours = rows.reduce((s, r) => s + r.hours, 0);
       const total = hours * RATE;
-      const low = roundTo(total * 0.94, 10000);
-      const high = roundTo(total * 1.16, 10000);
+      const low = roundTo(total, 10000);
+      const high = roundTo(total * 1.18, 10000);
       const weeksLow = Math.max(base.weeks, Math.round(hours / 30));
       const weeksHigh = weeksLow + Math.max(2, Math.round(weeksLow * 0.25));
 
@@ -457,8 +457,23 @@ const integrations = [
       };
     }
 
+    // Типовой объём для каждого вида проекта: переключение типа не оставляет
+    // «лендинг на 24 экрана», который выглядит как ошибка расчёта.
+    const TYPICAL: Record<string, number> = { promo: 1, corporate: 12, shop: 18, product: 16 };
+    const range = form.querySelector<HTMLInputElement>('#est-screens')!;
+    const scaleMin = est.querySelector<HTMLElement>('[data-scale-min]')!;
+
     form.addEventListener('input', calc);
-    form.addEventListener('change', calc);
+    form.addEventListener('change', (e) => {
+      const target = e.target;
+      if (target instanceof HTMLInputElement && target.name === 'est-type') {
+        const base = BASE[target.value];
+        range.min = String(base.min);
+        range.value = String(TYPICAL[target.value] ?? base.min);
+        scaleMin.textContent = String(base.min);
+      }
+      calc();
+    });
     calc();
 
     sendBtn.addEventListener('click', () => {

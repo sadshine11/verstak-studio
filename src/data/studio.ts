@@ -50,7 +50,7 @@ export const services: Service[] = [
   {
     id: 'promo',
     title: 'Лендинг под кампанию',
-    price: 'от 190 000 ₽',
+    price: 'от 240 000 ₽',
     term: '3–4 недели',
     summary: 'Одна страница под конкретный запуск: продукт, набор, мероприятие.',
     includes: [
@@ -65,7 +65,7 @@ export const services: Service[] = [
   {
     id: 'corporate',
     title: 'Корпоративный сайт',
-    price: 'от 480 000 ₽',
+    price: 'от 540 000 ₽',
     term: '6–9 недель',
     summary: 'Сайт компании, которую выбирают по сайту: продукты, доказательства, точки входа.',
     includes: [
@@ -81,7 +81,7 @@ export const services: Service[] = [
   {
     id: 'shop',
     title: 'Интернет-магазин',
-    price: 'от 950 000 ₽',
+    price: 'от 890 000 ₽',
     term: '10–16 недель',
     summary: 'Каталог, который выдерживает реальный ассортимент и реальную нагрузку.',
     includes: [
@@ -97,7 +97,7 @@ export const services: Service[] = [
   {
     id: 'product',
     title: 'Сервис и личный кабинет',
-    price: 'от 1 200 000 ₽',
+    price: 'от 1 150 000 ₽',
     term: 'от 12 недель',
     summary: 'Интерфейс, в котором работают каждый день, — здесь цена ошибки выше.',
     includes: [
