@@ -310,7 +310,7 @@ const isActive = (href: string) => {
     if (open) menu.querySelector<HTMLAnchorElement>('a')?.focus();
   }
 
-  burger?.addEventListener('click', () => setMenu(menu?.hidden ?? true));
+  burger?.addEventListener('click', () => setMenu(Boolean(menu?.hidden ?? true)));
   menu?.addEventListener('click', (e) => {
     if ((e.target as HTMLElement).closest('a')) setMenu(false);
   });

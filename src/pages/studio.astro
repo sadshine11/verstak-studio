@@ -97,7 +97,7 @@ import { u } from '../lib/url';
         />
       </div>
 
-      <div class="ptable">
+      <div class="ptable" role="region" aria-label="Этапы проекта" tabindex="0">
         <table class="tbl">
           <caption class="vh">Этапы проекта, сроки, содержание и результат каждого этапа</caption>
           <thead>
@@ -380,6 +380,40 @@ import { u } from '../lib/url';
     }
     .team__item { border-right: 0; border-bottom: 1px solid var(--line); padding-right: 0; }
   }
+  /* На телефоне таблица этапов разворачивается в блоки — без бокового скролла. */
+  @media (max-width: 760px) {
+    .ptable { overflow: visible; }
+    .ptable table { min-width: 0; }
+    .ptable thead { display: none; }
+    .ptable table,
+    .ptable tbody,
+    .ptable tr,
+    .ptable td { display: block; width: 100%; }
+    .ptable tr { padding: 1.2rem 0; border-top: 1px solid var(--line); }
+    .ptable tr:first-child { border-top: 0; }
+    .ptable td { border: 0; padding: 0; }
+    .ptable td.p-n,
+    .ptable td.p-t,
+    .ptable td.p-w,
+    .ptable td.p-o { width: 100%; }
+    .ptable .p-t { margin: 0.15rem 0 0.6rem; }
+    .ptable .p-w { padding-right: 0; }
+    .ptable .p-o {
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--line);
+    }
+    .ptable .p-o::before {
+      content: 'На выходе';
+      display: block;
+      font: 500 0.6875rem/1 var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 0.3rem;
+    }
+  }
+
   @media (max-width: 720px) {
     .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
     .phead__spec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
