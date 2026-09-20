@@ -5,7 +5,7 @@ import { services } from '../data/studio';
 <div class="svc">
   {
     services.map((s, i) => (
-      <details class="svc__item" name="services" open={i === 0} id={`svc-${s.id}`}>
+      <details class="svc__item" open={i === 0} id={`svc-${s.id}`}>
         <summary class="svc__sum">
           <span class="svc__n mono">{String(i + 1).padStart(2, '0')}</span>
           <span class="svc__ttl">

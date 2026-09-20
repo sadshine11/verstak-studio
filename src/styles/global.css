@@ -62,15 +62,12 @@
   --ink-2: #3c404a;
   --ink-3: #555a63; /* контраст 4.7:1 на цементном фоне — минимум для мелкого текста */
   --ground: #d5d7d0;
-  --ground-deep: #c8cac2;
   --paper: #f0f1ed;
   --paper-2: #e6e7e2;
   --accent: #2536d8;
   --accent-deep: #1a27a6;
-  --accent-soft: #dfe2fb;
   --marker: #e9e34a;
   --danger: #b3261e;
-  --ok: #1d6a4f;
 
   --line: color-mix(in srgb, var(--ink) 16%, transparent);
   --line-2: color-mix(in srgb, var(--ink) 28%, transparent);
@@ -435,3 +432,46 @@ hr.rule {
 }
 
 .stack { display: grid; align-content: start; }
+
+/* --- Печать: смету и процесс распечатывают чаще, чем кажется ------------- */
+@media print {
+  .topbar,
+  .hdr,
+  .menu,
+  .skip,
+  .burger { display: none !important; }
+
+  body { background: #ffffff; color: #000000; font-size: 11pt; }
+
+  .band,
+  .band--paper,
+  .band--ink {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding-block: 0.9rem;
+    --ink: #000000;
+    --ink-2: #222222;
+    --ink-3: #555555;
+    --line: #dddddd;
+    --line-2: #bbbbbb;
+    --line-strong: #888888;
+    --accent: #000000;
+    --marker: #000000;
+    --paper: #ffffff;
+    --paper-2: #ffffff;
+  }
+
+  .btn,
+  .arrow-link { display: none; }
+
+  a { text-decoration: none; }
+  main a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #555555;
+    word-break: break-all;
+  }
+
+  h1, h2, h3 { break-after: avoid; }
+  tr, li, figure, .svc__item { break-inside: avoid; }
+}
